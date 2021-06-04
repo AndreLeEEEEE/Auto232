@@ -27,13 +27,9 @@ The data obtained from Termite is expected to be these emissions. Fortunately, T
 plug-in that attaches a time to everything trasmitted. However, the program still has to do time calculations
 to combine all the individual pieces of data into periods of activity and inactivity.
 
-Since we're using Termite, the log file can't be produced until the end of the day because Termite
-doesn't possess an inherent way to write to a file or send data to something else as it's 
-receiving data.
-
-This brings up two methods. The first method is to wait until the log is extended at the end of the day. 
-When the log file exists, Termite will automatically add new data into it. The program would be run on
-that log at a later time to produce the excel sheet.
-The second method would run the program alongside Termite all day. Data would be put into the program
-as it appeared on Termite. This skips the log creation from Termite and processes all data immediately.
-This also means the excel sheet would receive constant updates throughout the day.
+The log plug-in allows Termite to write all data it sees, inbound and outbound, into a file. Yes, just a
+file, it's not a text file. Python can still read from this type like a normal text file so no worries
+there. Anyway, you don't have to close Termite in order to save the data to the log, it'll do so as it
+runs. This log will be in a network drive so any computer can access the log if they can access the drive.
+From there, I would run the program on that file at the end of the week to produce an excel sheet. This
+weekly report would be put into the network drive. 
