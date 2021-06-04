@@ -4,7 +4,7 @@ The program will process data from Termite and print it on an excel sheet for ea
 The type of data we're looking for is:
 - When the belt moves and for how long
 - When the belt stops and for how long
-- 
+
 Versions of software and digital tools:
 - python 3.7.8
 - Visual Studio 16.10.0
