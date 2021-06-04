@@ -31,7 +31,9 @@ Since we're using Termite, the log file can't be produced until the end of the d
 doesn't possess an inherent way to write to a file or send data to something else as it's 
 receiving data.
 
-This brings up two methods. The first method is to rely on someone working the auto line to create the log
-file at the end of the work day. They'd then use this program.exe to process the log and produce an excel
-sheet. The second method would run the program alongside Termite all day. Data would be put into the program
+This brings up two methods. The first method is to wait until the log is extended at the end of the day. 
+When the log file exists, Termite will automatically add new data into it. The program would be run on
+that log at a later time to produce the excel sheet.
+The second method would run the program alongside Termite all day. Data would be put into the program
 as it appeared on Termite. This skips the log creation from Termite and processes all data immediately.
+This also means the excel sheet would receive constant updates throughout the day.
