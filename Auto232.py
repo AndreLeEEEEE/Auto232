@@ -1,5 +1,4 @@
 #import openpyxl
-import re
 
 def readFile(logs):
     """Extract the log data and make it usable."""
@@ -97,6 +96,42 @@ def analyzeData(log):
     """
     log - list of str, contains the entries of a session
     """
+    pTime = ""  # Holds previous time
+    cTime = ""  # Holds current time
+    moving = True
+    for line in log[1::]:
+        entry = line.split()
+        if line == log[1]:
+            pTime = entry[0]
+        else:  # Update cTime
+            cTime = entry[0]
+            TD = timeDiff(pTime[0::-1], cTime[0::-1])
+            if entry[1] == "1":  # Reached end of chain
+                if TD > 28.125:
+                    print("It stoppin")
+                else:
+                    print("It smoovin")
+            elif entry[1] == "0":  # Reached end of trolley
+                if TD > 2.8125:
+                    print("It stoppin")
+                else:
+                    print("It smoovin")
+            else:  # Connection error
+                pass  # Placeholder
+            pTime = cTime
+
+    # Fastest recorded time - 7 ft/min
+    # Slowest recorded time - 4 ft/min
+    # Length between trolleys (inner) - 22.5 in
+    # Length between trolleys (outer) - 27 in
+    # Difference between inner and outer length - 4.5 in
+    # Diameter of trolley/jutted metal - 2.25 in
+    # Radius of trolley - 1.125 in
+    # Length between center of trolleys - 24.75 in
+    # 4 ft/min = 0.8 in/s
+    # Distance between the same sides of two trolleys = 24.75 in
+    # Calculated amount of time to traverse a trolley (w/slowest speed) = 2.8125 s
+    # Calcualted amount of time to go from end to begin of trolley (w/slowest speed) = 28.125 s
 
 
 def main():
