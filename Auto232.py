@@ -1,4 +1,4 @@
-import openpyxl
+#import openpyxl
 import re
 
 def readFile(logs):
@@ -38,27 +38,63 @@ def checkValidity(log):
     log - list of str, contains the entries of a session
     """
     state = "High"  # Used to make sure the 1's and 0's alternate
-    error = False  # Will be marked True if there's a problem
+    pTime = ""  # Holds previous time
+    cTime = ""  # Holds current time
+    error = 0  # Will have a different value if there's a problem
 
     if not log[0].__contains__("Termite log"):
         # Execute if the session doesn't start with this
-        error = True
+        error = 1
 
-    for entry in log[1::]:  # Starting after the new session marker
-        if (entry[-1] == "1") and (state == "High"):  # Confirm a 1
+    for line in log[1::]:  # Starting after the new session marker
+        entry = line.split()
+        if (entry[1] == "1") and (state == "High"):  # Confirm a 1
             state = "Low"  # Now expecting a 0 next
-        elif (entry[-1] == "0") and (state == "Low"):  # Confirm a 0
+        elif (entry[1] == "0") and (state == "Low"):  # Confirm a 0
             state = "High"  # Now expecting a 1 next
-        elif entry[-1] == "3":
-            # This won't be handled in this function
+        elif entry[1] == "3":  # This won't be handled in this function
             pass
-        else:
-            # Occurs if 
-            error = True
+        else:  # Occurs if the transmitted data is unrecognized
+            error = 2
+            break
 
-    if error:
-        raise Exception("There's a syntactical error in the Termite log file")
+        if line == log[1]:  # Set pTime if first entry
+            pTime = entry[0]
+        else:  # Update cTime
+            cTime = entry[0]
+        if pTime > cTime:  # If pTime is later than cTime
+            error = 3
+            break
+        else:  # Update pTime when check passed
+            pTime = cTime
+
+    if error == 1:
+        raise Exception("There's a marking error in the Termite log file")
+    elif error == 2:
+        raise Exception("There's a time error in the Termite log file")
+    elif error == 3:
+        raise Exception("There's a time error in the Termite log file")
+
+def timeDiff(time1, time2):
+    """Compare two times and return the difference in seconds."""
+    """
+    time1 - str, a time in HH:MM:SS.SS format, supposed to be earlier
+    time2 - str, a time in HH:MM:SS.SS format, supposed to be later
+    """
+    if time1 > time2:
+        raise Exception("There's a time error in the Termite log file")
+
+def analyzeData(log):
+    """Determine when/for how long the belt moved and stopped"""
+    """
+    log - list of str, contains the entries of a session
+    """
+
 
 def main():
-    logs = []
-    readFile(logs)
+    #logs = []
+    #readFile(logs)
+    #for log in logs:
+    #    analyzeData(log)
+
+main()
