@@ -81,8 +81,16 @@ def timeDiff(time1, time2):
     time1 - str, a time in HH:MM:SS.SS format, supposed to be earlier
     time2 - str, a time in HH:MM:SS.SS format, supposed to be later
     """
-    if time1 > time2:
-        raise Exception("There's a time error in the Termite log file")
+    time1 = time1.split(":")
+    time2 = time2.split(":")
+
+    hours = float(time2[0]) - float(time1[0])
+    minutes = float(time2[1]) - float(time1[1])
+    seconds = float(time2[2]) - float(time1[2])
+
+    seconds += hours * 60 * 60
+    seconds += minutes * 60
+    return seconds
 
 def analyzeData(log):
     """Determine when/for how long the belt moved and stopped"""
