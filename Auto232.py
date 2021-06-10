@@ -36,16 +36,23 @@ def checkValidity(log):
     """
     log - list of str, contains session info and entries
     """
-    state = "High"  # Used to make sure the 1's and 0's alternate
+    state = ""  # Used to make sure the 1's and 0's alternate
     pTime = ""  # Holds previous time
     cTime = ""  # Holds current time
 
     if not log[0].__contains__("Termite log"):
         # Execute if the session doesn't start with this
         raise Exception("Error in a session info stamp")
+    if len(log) == 1: return  # A stamp but no entries
 
     for line in log[1:]:  # Starting after the session info stamp
         entry = line.split()  # Separate time and data
+        if line == log[1]:  # Set state depending on first data entry
+            if entry[1] == "1":
+                state = "High"
+            elif entry[1] == "0":
+                state = "Low"
+
         if (entry[1] == "1") and (state == "High"):  # Confirm a 1
             state = "Low"  # Now expecting a 0 next
         elif (entry[1] == "0") and (state == "Low"):  # Confirm a 0
@@ -59,10 +66,10 @@ def checkValidity(log):
             pTime = entry[0]
         else:  # Update cTime
             cTime = entry[0]
-        if pTime > cTime:  # If pTime is later than cTime
-            raise Exception("Time error in session: {}".format(log[0]))
-        else:  # Update pTime when check passed
-            pTime = cTime
+            if pTime > cTime:  # If pTime is later than cTime
+                raise Exception("Time error in session: {}".format(log[0]))
+            else:  # Update pTime when check passed
+                pTime = cTime
 
 def timeDiff(time1, time2):
     """Compare two times and return the difference in seconds."""
@@ -113,6 +120,7 @@ def analyzeData(log):
         entry = line.split()  # Separate time and data
         if line == log[1]:  # On the first entry
             prevTime = entry[0]  # Set prevTime
+
         else:  # Update end
             end = entry[0]
             TD = timeDiff(prevTime[0:-1], end[0:-1])
@@ -124,10 +132,19 @@ def analyzeData(log):
                 pass  # Placeholder
             prevTime = end
 
+        if line == log[-1]:
+            if len(SmooveBlocks[-1]) == 1:
+                SmooveBlocks[-1].append(end[0:-1])
+            else:
+                SmooveBlocks.append([end[0:-1], end[0:-1]])
+
+    for block in SmooveBlocks:
+        print(block)
+
 def main():
-    #logs = []
-    #readFile(logs)
-    #for log in logs:
-    #    analyzeData(log)
-    pass
+    logs = []
+    readFile(logs)
+    for log in logs:
+        analyzeData(log)
+
 main()
