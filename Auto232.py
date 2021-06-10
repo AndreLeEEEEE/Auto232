@@ -34,19 +34,18 @@ def readFile(logs):
 def checkValidity(log):
     """Make sure there's nothing syntactically wrong with the data."""
     """
-    log - list of str, contains the entries of a session
+    log - list of str, contains session info and entries
     """
     state = "High"  # Used to make sure the 1's and 0's alternate
     pTime = ""  # Holds previous time
     cTime = ""  # Holds current time
-    error = 0  # Will have a different value if there's a problem
 
     if not log[0].__contains__("Termite log"):
         # Execute if the session doesn't start with this
-        error = 1
+        raise Exception("Error in a session info stamp")
 
-    for line in log[1::]:  # Starting after the new session marker
-        entry = line.split()
+    for line in log[1:]:  # Starting after the session info stamp
+        entry = line.split()  # Separate time and data
         if (entry[1] == "1") and (state == "High"):  # Confirm a 1
             state = "Low"  # Now expecting a 0 next
         elif (entry[1] == "0") and (state == "Low"):  # Confirm a 0
@@ -54,25 +53,16 @@ def checkValidity(log):
         elif entry[1] == "3":  # This won't be handled in this function
             pass
         else:  # Occurs if the transmitted data is unrecognized
-            error = 2
-            break
+            raise Exception("Unrecognized data in session: {}".format(log[0]))
 
         if line == log[1]:  # Set pTime if first entry
             pTime = entry[0]
         else:  # Update cTime
             cTime = entry[0]
         if pTime > cTime:  # If pTime is later than cTime
-            error = 3
-            break
+            raise Exception("Time error in session: {}".format(log[0]))
         else:  # Update pTime when check passed
             pTime = cTime
-
-    if error == 1:
-        raise Exception("There's a marking error in the Termite log file")
-    elif error == 2:
-        raise Exception("There's a time error in the Termite log file")
-    elif error == 3:
-        raise Exception("There's a time error in the Termite log file")
 
 def timeDiff(time1, time2):
     """Compare two times and return the difference in seconds."""
@@ -91,53 +81,53 @@ def timeDiff(time1, time2):
     seconds += minutes * 60
     return seconds
 
+def moveDetector(diff, period, moveBlocks, start, pTime):
+    """Check if the belt is moving or stopped."""
+    """
+    diff - float, difference in seconds between current time and pTime
+    period - diff, amount seconds to compare diff to 
+    moveBlocks - list of list of str, stores intervals of movement
+    start - str, time when the belt started moving
+    pTime - str, previous time
+    """
+    if diff < period:  # If smoovin
+        if not start:  # Start of movement interval
+            start = pTime  # Set start
+            moveBlocks.append([start[0:-1]])  # Record start of interval
+    else:  # If stoppin
+        if start:  # End of movement interval
+            moveBlocks[-1].append(pTime[0:-1])  # Record end of interval
+            start = ""  # Clear start
+    return start
+
 def analyzeData(log):
-    """Determine when/for how long the belt moved and stopped"""
+    """Return when/for how long the belt moved and stopped"""
     """
-    log - list of str, contains the entries of a session
+    log - list of str, contains session info and entries
     """
-    pTime = ""  # Holds previous time
-    cTime = ""  # Holds current time
-    moving = True
-    for line in log[1::]:
-        entry = line.split()
-        if line == log[1]:
-            pTime = entry[0]
-        else:  # Update cTime
-            cTime = entry[0]
-            TD = timeDiff(pTime[0::-1], cTime[0::-1])
+    begin = ""  # Holds time that starts a state
+    end = ""  # Holds time that ends a state, doubles as current time
+    prevTime = ""  # Holds previous time
+    SmooveBlocks = []
+    for line in log[1:]:  # Go through each entry
+        entry = line.split()  # Separate time and data
+        if line == log[1]:  # On the first entry
+            prevTime = entry[0]  # Set prevTime
+        else:  # Update end
+            end = entry[0]
+            TD = timeDiff(prevTime[0:-1], end[0:-1])
             if entry[1] == "1":  # Reached end of chain
-                if TD > 28.125:
-                    print("It stoppin")
-                else:
-                    print("It smoovin")
-            elif entry[1] == "0":  # Reached end of trolley
-                if TD > 2.8125:
-                    print("It stoppin")
-                else:
-                    print("It smoovin")
+                begin = moveDetector(TD, 28.125, SmooveBlocks, begin, prevTime)
+            elif entry[1] == "0":  # Reached end of buckle
+                begin = moveDetector(TD, 2.8125, SmooveBlocks, begin, prevTime)
             else:  # Connection error
                 pass  # Placeholder
-            pTime = cTime
-
-    # Fastest recorded time - 7 ft/min
-    # Slowest recorded time - 4 ft/min
-    # Length between trolleys (inner) - 22.5 in
-    # Length between trolleys (outer) - 27 in
-    # Difference between inner and outer length - 4.5 in
-    # Diameter of trolley/jutted metal - 2.25 in
-    # Radius of trolley - 1.125 in
-    # Length between center of trolleys - 24.75 in
-    # 4 ft/min = 0.8 in/s
-    # Distance between the same sides of two trolleys = 24.75 in
-    # Calculated amount of time to traverse a trolley (w/slowest speed) = 2.8125 s
-    # Calcualted amount of time to go from end to begin of trolley (w/slowest speed) = 28.125 s
-
+            prevTime = end
 
 def main():
     #logs = []
     #readFile(logs)
     #for log in logs:
     #    analyzeData(log)
-
+    pass
 main()
