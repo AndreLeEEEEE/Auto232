@@ -1,6 +1,6 @@
-import openpyxl
-import re
-import time
+import openpyxl  # Needed for Excel
+import re  # Needed for special splits and sub
+import time  # Needed for dates
 
 def readFile(logs):
     """Extract the log data and make it usable."""
