@@ -39,7 +39,7 @@ From there, I would run the program on that file at the end of the week to produ
 weekly report would be put into the network drive. 
 
 Update 6/8/2021: There are four options that Rick and I have gone over in terms of hardware.
-1. The current prototype that relies on a 'wireless' connection between the transmitter and receiver.
+1. The current prototype that relies on a 'wireless' (RF) connection between the transmitter and receiver.
 The data sent is that as seen above.
 2. The current prototype except there's a wired connection for more reliable transmissions.
 3. Attaching a kind of external add-on to the conveyor belt motor to detect when a current is present,
