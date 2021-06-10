@@ -2,11 +2,15 @@
     Slowest recorded time - 4 ft/min
     Length between trolleys (inner) - 22.5 in
     Length between trolleys (outer) - 27 in
+    
+    Trolley can also replaced with buckle since I believe that the buckle that connects to the trolley
+    is of the same width. 
+    
     Difference between inner and outer length - 4.5 in
-    Diameter of trolley/jutted metal - 2.25 in
-    Radius of trolley - 1.125 in
-    Length between center of trolleys - 24.75 in
+    Diameter of buckle - 2.25 in
+    Radius of buckle - 1.125 in
+    Length between center of buckles - 24.75 in
     4 ft/min = 0.8 in/s
-    Distance between the same sides of two trolleys = 24.75 in
-    Calculated amount of time to traverse a trolley (w/slowest speed) = 2.8125 s
-    Calcualted amount of time to go from end to begin of trolley (w/slowest speed) = 28.125 s
+    Distance between the same sides of two buckles (ex. left side to left side) = 24.75 in
+    Calculated amount of time to traverse a buckle (w/slowest speed) = 2.8125 s
+    Calculated amount of time to travel distance between the same sides of two buckles (w/slowest speed) = 28.125 s
