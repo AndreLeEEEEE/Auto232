@@ -55,3 +55,12 @@ be plugged into an outlet for power.
 Option 3 does not have a thought-out plan for data retrieval.
 Option 4 is the only one that is less 'real-time' as I don't think Termite will have to be running all
 day for it. 
+
+Update 6/10/2021: Completed the first version of the program. At the moment, the only aspects to take into 
+consideration is the handling of 3 and excel workbooks. When 3 is the data in an entry, I'm not sure what
+to do with the session. Since the belt can move during a connection lost, that would screw up the rest of
+the session entries. As for the excel workbooks, this program creates a new report per execution (denoted
+by the title including the date of creation). Since the idea is that these workbooks will be on a shared
+network, I don't know if space conservation is a goal. If it is, new weekly data would have to be appended
+to the same workbook either as a new sheet or directly below past data. I'll have to ask Alex when both of
+us get back from vacation.
