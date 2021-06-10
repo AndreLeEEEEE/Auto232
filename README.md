@@ -27,7 +27,7 @@ The transmitter, at the moment, sends three signals: 0, 1, and 3.
 This means that, when working as intended, the hardware will alternate between transmitting 1's and 0's;
 which could also be seen as pairs of 1 and 0.
 
-Termite has a time stamp plug-in that attaches a time to everything trasmitted. However, the program 
+Termite has a time stamp plug-in that attaches a time to everything transmitted. However, the program 
 still has to do time calculations to combine all the individual pieces of data into periods of activity
 and inactivity.
 
