@@ -1,9 +1,11 @@
 import openpyxl
+import re
+import time
 
 def readFile(logs):
     """Extract the log data and make it usable."""
     """
-    logs - list of str, empty, will contain all session information
+    logs - list of list of str, empty, will contain all session information
     """
     with open("BeltMovement", "r") as file:
         Lines = file.readlines()
@@ -108,7 +110,7 @@ def moveDetector(diff, period, moveBlocks, start, pTime):
     return start
 
 def analyzeData(log):
-    """Return when/for how long the belt moved and stopped"""
+    """Return when/for how long the belt moved and stopped."""
     """
     log - list of str, contains session info and entries
     """
@@ -132,23 +134,46 @@ def analyzeData(log):
                 pass  # Placeholder
             prevTime = end
 
-        if line == log[-1]:
-            if len(SmooveBlocks[-1]) == 1:
+        if line == log[-1]:  # On last entry
+            if len(SmooveBlocks[-1]) == 1:  # Complete the interval
                 SmooveBlocks[-1].append(end[0:-1])
-            else:
+            else:  # Or make it the last interval
                 SmooveBlocks.append([end[0:-1], end[0:-1]])
 
     return SmooveBlocks
 
 def toExcel(logs, xlData):
-    try:
-        wb = openpyxl.load_workbook('AutoLine_Weekly_Report.xlsx')
-    except:
-        wb = openpyxl.Workbook()
-        
-    ws = wb.active
+    """Make Excel workbook with data."""
+    """
+    logs - list of list of str, contains all session information
+    xlData - list of list of str, moving intervals for every session
+    """
+    #try:
+        #wb = openpyxl.load_workbook('AutoLine_Weekly_Report.xlsx')
+    #except:
+    wb = openpyxl.Workbook()  # Create a new workbook
+    ws = wb.active  # Set only sheet as active
+    row_num = 1  # Will change to cover many rows, starts as first row
+    ws.cell(row=row_num, column=1).value = "All intervals represent periods of movement"
+    for x in range(len(logs)):  # For each session
+        stamp = re.split("Termite log, started at ", logs[x][0])[1]  # Time stamp
+        ws.cell(row=row_num+2, column=1).value = stamp
+        ws.cell(row=row_num+3, column=1).value = "HH:MM:SS.SS in military time"
+        row_num += 3  # Update row_num to reach right before next empty row
 
-
+        data = xlData[x]  # Data for only one session
+        if data:  # If there's something
+            count = len(data)  # Amount of intervals
+            for i in range(1, count+1):  # For each interval
+                B = data[i-1][0]  # Beginning of interval
+                E = data[i-1][1]  # Ending of interval
+                ws.cell(row=row_num+i, column=1).value = B + "-" + E
+        row_num += count  # Update row_num to pass all recently filled rows
+    
+    date = time.strftime("%D", time.localtime())  # Get MM/DD/YYYY
+    date = re.sub("/", "_", date)  # Replace / with _ for valid name
+    name = "AutoLine_Weekly_Report_" + date + ".xlsx"
+    wb.save(name)  # save changes
 
 def main():
     logs = []
