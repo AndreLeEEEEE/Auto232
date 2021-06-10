@@ -1,4 +1,4 @@
-#import openpyxl
+import openpyxl
 
 def readFile(logs):
     """Extract the log data and make it usable."""
@@ -138,13 +138,24 @@ def analyzeData(log):
             else:
                 SmooveBlocks.append([end[0:-1], end[0:-1]])
 
-    for block in SmooveBlocks:
-        print(block)
+    return SmooveBlocks
+
+def toExcel(logs, xlData):
+    try:
+        wb = openpyxl.load_workbook('AutoLine_Weekly_Report.xlsx')
+    except:
+        wb = openpyxl.Workbook()
+        
+    ws = wb.active
+
+
 
 def main():
     logs = []
+    xlData = []
     readFile(logs)
     for log in logs:
-        analyzeData(log)
+        xlData.append(analyzeData(log))
+    toExcel(logs, xlData)
 
 main()
