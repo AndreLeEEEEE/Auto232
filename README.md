@@ -67,7 +67,7 @@ network, I don't know if space conservation is a goal. If it is, new weekly data
 to the same workbook either as a new sheet or directly below past data. I'll have to ask Alex when both of
 us get back from vacation.
 
-Update 6/23/2021: After talking to Glenn about this project. He suggested that the prototype's idea be
+Update 6/22/2021: After talking to Glenn about this project. He suggested that the prototype's idea be
 dropped in favor of monitoring the motor or "control line". These machines wouldn't be modified directly;
 instead, we could attach an external piece of hardware like a hour meter to measure the total active time.
 Now, this idea seems similar to option 4 with the motor. The difference is that option 4 would've presumedly
@@ -88,4 +88,12 @@ come from him. Thus, either he'd have to be a part of the discussion too or I'd 
 due to the animosity between Rick and Glenn. The only piece of information I have about which way the project
 will go is that Alex said in an email that he doesn't want to tie into the Wagner control panel. This 
 statement might stem from an impression that using the control panel means changing it internally. 
+
+Update 6/24/2021: Rick has informed me that him and Alex decided to change the hardware's RF connection
+to a wired connection. This has made the transmittance of '3' kinda obsolete since you can't interupt
+a wireless connection if the wireless connection doesn't exist. The only way the hardware would transmit
+a '3' is if it's destroyed. Thanks to Rick's confirmation, we're definitely not touching the control
+line/panel. Rick also plans to implement a feature in the hardware that allows someone to change it from
+the terminal? I'll have to ask him to elobarate on this next week since he plans to finish these modifications
+over this weekend.
 
