@@ -66,3 +66,26 @@ by the title including the date of creation). Since the idea is that these workb
 network, I don't know if space conservation is a goal. If it is, new weekly data would have to be appended
 to the same workbook either as a new sheet or directly below past data. I'll have to ask Alex when both of
 us get back from vacation.
+
+Update 6/23/2021: After talking to Glenn about this project. He suggested that the prototype's idea be
+dropped in favor of monitoring the motor or "control line". These machines wouldn't be modified directly;
+instead, we could attach an external piece of hardware like a hour meter to measure the total active time.
+Now, this idea seems similar to option 4 with the motor. The difference is that option 4 would've presumedly
+relied on hardware made in-house and that hardware would record periods of activity. Meanwhile, the hour 
+meter in the new idea could be attached to the motor or control line, but it'd only return the total amount
+of time the belt was active. This is less detailed than option 4, as the latter would show exactly when the
+belt was active and inactive. This depends on how much information Alex wants (he was the one who assigned
+this project after all). Of course, the hour meter was just what Glenn mentioned. There could be other 
+devices out there for purchase that return the specifics of the belt's movement. Another requirement for 
+these "other devices" is that I can pull data from them in an efficient way. After browsing some hour meters
+online, it seems that most of them display the incremented time akin to stopwatches. Besides that, nothing
+else. This means the (seemingly) only way to extract data from the meter is to physically check them at 
+the end of the day and record the time; which is a step back from the semi-automatic data collection process
+of the current prototype. Both Alex and Glenn said that they'd talk with each other about which option is
+more viable, though given their busy schedules I don't imagine that it'll happen soon. In addition, since
+Rick is the creator of the prototype, any change in plans that involve hardware made in-house should still
+come from him. Thus, either he'd have to be a part of the discussion too or I'd have to act as an intermediary
+due to the animosity between Rick and Glenn. The only piece of information I have about which way the project
+will go is that Alex said in an email that he doesn't want to tie into the Wagner control panel. This 
+statement might stem from an impression that using the control panel means changing it internally. 
+
