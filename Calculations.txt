@@ -1,5 +1,5 @@
-    Fastest recorded time - 7 ft/min
-    Slowest recorded time - 4 ft/min
+    Fastest recorded time - 7 ft/min = 1.4 in/s
+    Slowest recorded time - 4 ft/min = 0.8 in/s
     Length between trolleys (inner) - 22.5 in
     Length between trolleys (outer) - 27 in
     
@@ -9,8 +9,18 @@
     Difference between inner and outer length - 4.5 in
     Diameter of buckle - 2.25 in
     Radius of buckle - 1.125 in
-    Length between center of buckles - 24.75 in
-    4 ft/min = 0.8 in/s
-    Distance between the same sides of two buckles (ex. left side to left side) = 24.75 in
+    Length between center of buckles/Distance between the same sides of two buckles (ex. left side to left side) - 24.75 in
     Calculated amount of time to traverse a buckle (w/slowest speed) = 2.8125 s
     Calculated amount of time to travel distance between the same sides of two buckles (w/slowest speed) = 28.125 s
+    
+    At the slowest speed, calculations say that a single buckle should take at max 2.8125 s to pass the metal detector
+    from end to end. Calculations also say that a single buckle should take at max 28.125 s to go from the end of one
+    buckle to the beginning of the next.
+    
+    There is one thing I forgot to account for though, the length between a buckle pair isn't equal to the length
+    between pairs of buckles. See Figure 1 for clarification. This means that instead of alternating between two checks:
+    one for passing a buckle and one for reaching the next buckle, the program needs three checks: passing a buckle (A), 
+    reaching next buckle within pair (B), and reaching next buckle out of pair (C). These checks correspond to different lengths
+    that are labeled on Figure 1. I don't think I can calculate the missing length (C) with the current information, I'll have
+    to ask about the length directly from the auto line. Even if I ask about the total length of the chain, I can't get C
+    because I don't know how often B repeats.
