@@ -1,5 +1,7 @@
     Fastest recorded time - 7 ft/min = 1.4 in/s
     Slowest recorded time - 4 ft/min = 0.8 in/s
+    
+    /* This information is irrelevant because the hardware is supposed to be detecting the chain links and not the trolleys
     Length between trolleys (inner) - 22.5 in
     Length between trolleys (outer) - 27 in
     
@@ -16,3 +18,9 @@
 
     Something to note is that there aren't any other distances on the belt to cover. On the I-beam, the distribution
     of trolleys are even. Thus, we're left with the length between trolleys and the length of a trolley.
+    */
+    
+    Length of single and double chain link - 4.25 in
+    Length of gap in double link (estimate) - 80% of total length = 3.4 in
+    Time to pass a single link - 5.3125 s
+    Time to pass a gap (estimate) - 4.25 s
