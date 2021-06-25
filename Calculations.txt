@@ -3,16 +3,16 @@
     Length between trolleys (inner) - 22.5 in
     Length between trolleys (outer) - 27 in
     
-    Trolley can also replaced with buckle since I believe that the buckle that connects to the trolley
-    is of the same width. 
-    
     Difference between inner and outer length - 4.5 in
-    Diameter of buckle - 2.25 in
-    Radius of buckle - 1.125 in
-    Length between center of buckles/Distance between the same sides of two buckles (ex. left side to left side) - 24.75 in
-    Calculated amount of time to traverse a buckle (w/slowest speed) = 2.8125 s
-    Calculated amount of time to travel distance between the same sides of two buckles (w/slowest speed) = 28.125 s
+    Diameter of trolley - 2.25 in
+    Radius of trolley - 1.125 in
+    Length between center of trolleys/Distance between the same sides of two trolleys (ex. left side to left side) - 24.75 in
+    Calculated amount of time to traverse a trolley (w/slowest speed) = 2.8125 s
+    Calculated amount of time to travel distance between two trolleys (w/slowest speed) = 28.125 s
     
-    At the slowest speed, calculations say that a single buckle should take at max 2.8125 s to pass the metal detector
-    from end to end. Calculations also say that a single buckle should take at max 28.125 s to go from the end of one
-    buckle to the beginning of the next.
+    At the slowest speed, calculations say that a single trolley should take at max 2.8125 s to pass the metal detector
+    from end to end. Calculations also say that a single trolley should take at max 28.125 s to go from the end of one
+    trolley to the beginning of the next.
+
+    Something to note is that there aren't any other distances on the belt to cover. On the I-beam, the distribution
+    of trolleys are even. Thus, we're left with the length between trolleys and the length of a trolley.
