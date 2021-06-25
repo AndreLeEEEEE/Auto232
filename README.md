@@ -93,7 +93,7 @@ Update 6/24/2021: Rick has informed me that him and Alex decided to change the h
 to a wired connection. This has made the transmittance of '3' kinda obsolete since you can't interupt
 a wireless connection if the wireless connection doesn't exist. The only way the hardware would transmit
 a '3' is if it's destroyed. Thanks to Rick's confirmation, we're definitely not touching the control
-line/panel. Rick also plans to implement a feature in the hardware that allows someone to change it from
-the terminal? I'll have to ask him to elobarate on this next week since he plans to finish these modifications
+line/panel. Rick also plans to implement a feature in the hardware that allows someone to change something
+from the terminal? I'll have to ask him to elaborate on this since he plans to finish these modifications
 over this weekend.
 
