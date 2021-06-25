@@ -128,7 +128,7 @@ def analyzeData(log):
             TD = timeDiff(prevTime[0:-1], end[0:-1])
             if entry[1] == "1":  # Reached end of chain
                 begin = moveDetector(TD, 28.125, SmooveBlocks, begin, prevTime)
-            elif entry[1] == "0":  # Reached end of buckle
+            elif entry[1] == "0":  # Reached end of trolley
                 begin = moveDetector(TD, 2.8125, SmooveBlocks, begin, prevTime)
             else:  # Connection error
                 pass  # Placeholder
