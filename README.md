@@ -97,3 +97,15 @@ line/panel. Rick also plans to implement a feature in the hardware that allows s
 from the terminal? I'll have to ask him to elaborate on this since he plans to finish these modifications
 over this weekend.
 
+Update 6/25/2021: As it turns out, the metal detector wasn't gonna be placed in front of the trolleys, it
+was gonna be placed in front of the chain itself (See Figure 1). Now, I have to refactor the program to
+accomodate the chains and not the trolleys. Only the time limits would require changing since the 
+calculations are still there. However, Rick explained that the additional feature he's installing would
+allow a "milliseconds mode" to be activated via inputting data into Termite. In this mode, the hardware
+would start counting how many milliseconds have passed since the last data transmitted until new data
+is transmitted. For example, the hardware will start counting after it transmits a 1. When it transmits
+a 0, that time will also be printed to Termite and the counting starts again. If the returned amount of
+time exceeds the appropriate time frame, the chain stopped. Regardless, I can only calculate the new time
+frames if I get the exact measurements of the chain links. The single and double links seem to be of the
+same length, but two single link ends intrude on a double link's gap. A single link was measured to be 
+around 4.25 inches and it's estimated that the gap is 80% of that.
