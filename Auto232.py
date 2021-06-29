@@ -13,24 +13,20 @@ def readFile(logs):
         temp = ""  # Meant for the first fragmented entry
         for line in Lines:
             # Any [0:-1] in this function is for removing the newline chr
-            if (line == "\n") or (line.__contains__("*")):
+            if (line == "\n") or (line.__contains__("*")): pass
                 # Skip empty lines and * placeholder lines
-                pass
-            elif line.__contains__("Termite log"):
+            elif line.__contains__("Termite log"): logs.append([line[0:-1]])
                 # Add a new session when the log marks a new session
-                logs.append([line[0:-1]])
-            elif len(line[0:-1]) == 1:
-                # Store the fragmented entry for later
-                temp = line[0:-1]
+            elif len(line[0:-1]) == 1: temp = line[0:-1]
+                # Store the fragmented entry for laters
             elif temp:
                 # Gather the fragments and record the complete entry
                 logs[-1].append(line.split(" ", 1)[0] + " " + temp)
                 # Record the currently read in complete entry
                 logs[-1].append(line.split(" ", 1)[1][0:-1])
                 temp = ""  # Clear the stored fragment
-            else:
+            else: logs[-1].append(line[0:-1])
                 # Record the entry
-                logs[-1].append(line[0:-1])
 
     for log in logs:  # Check each session
         checkValidity(log)
@@ -52,28 +48,26 @@ def checkValidity(log):
     for line in log[1:]:  # Starting after the session info stamp
         entry = line.split()  # Separate time and data
         if line == log[1]:  # Set state depending on first data entry
-            if entry[1] == "1":
-                state = "Low"
-            elif entry[1] == "0":
-                state = "High"
+            if entry[1] == "1": state = "Low"
+            elif entry[1] == "0": state = "High"
 
-        if (entry[1] == "1") and (state == "Low"):  # Confirm a 1
-            state = "High"  # Now expecting a 0 next
-        elif (entry[1] == "0") and (state == "High"):  # Confirm a 0
-            state = "Low"  # Now expecting a 1 next
-        elif entry[1] == "3":  # This won't be handled in this function
-            pass
+        if (entry[1] == "1") and (state == "Low"): state = "High"
+            # Confirm a 1, now expecting a 0 next
+        elif (entry[1] == "0") and (state == "High"): state = "Low"
+            # Confirm a 0, now expecting a 1 next
+        elif entry[1] == "3": pass
+            # This won't be handled in this function
         else:  # Occurs if the transmitted data is unrecognized
             raise Exception("Unrecognized data in session: {}".format(log[0]))
 
-        if line == log[1]:  # Set pTime if first entry
-            pTime = entry[0]
+        if line == log[1]: pTime = entry[0]
+            # Set pTime if first entry
         else:  # Update cTime
             cTime = entry[0]
             if pTime > cTime:  # If pTime is later than cTime
                 raise Exception("Time error in session: {}".format(log[0]))
-            else:  # Update pTime when check passed
-                pTime = cTime
+            else: pTime = cTime
+                # Update pTime when check passed
 
 def timeDiff(time1, time2):
     """Compare two times and return the difference in seconds."""
@@ -122,8 +116,8 @@ def analyzeData(log):
     SmooveBlocks = []
     for line in log[1:]:  # Go through each entry
         entry = line.split()  # Separate time and data
-        if line == log[1]:  # On the first entry
-            prevTime = entry[0]  # Set prevTime
+        if line == log[1]: prevTime = entry[0]
+            # On the first entry, set prevTime
         else:  # Update end
             end = entry[0]
             TD = timeDiff(prevTime[0:-1], end[0:-1])
@@ -131,8 +125,8 @@ def analyzeData(log):
                 begin = moveDetector(TD, 5.3125, SmooveBlocks, begin, prevTime)
             elif entry[1] == "0":  # Reached end of gap/start of chain
                 begin = moveDetector(TD, 4.25, SmooveBlocks, begin, prevTime)
-            else:  # Connection error
-                pass  # Placeholder
+            else: pass
+                # Connection error
             prevTime = end  # Update prevTime
 
         if line == log[-1] and len(SmooveBlocks[-1]) == 1:
