@@ -109,3 +109,14 @@ time exceeds the appropriate time frame, the chain stopped. Regardless, I can on
 frames if I get the exact measurements of the chain links. The single and double links seem to be of the
 same length, but two single link ends intrude on a double link's gap. A single link was measured to be 
 around 4.25 inches and it's estimated that the gap is 80% of that.
+
+Update 6/29/2021: Rick hasn't finished the next version of the metal detector yet, but the overall
+functionality has reamined intact. The new changes include, a wired connection between the transmitter
+and receiver, the reversal of 0's and 1's, and a placeholder for "millimode". The first change is
+self-explanatory. The second change covers the fact that the transmitter now outputs a 0 when the 
+detector approaches metal and a 1 when it moves away. This is the opposite from how it previously
+worked where a 1 was outputted when metal got close while a 0 appeared when metal moved away. The
+third change is still a work in progress. The plan is to turn on millimode by entering "ctrl+a" and to
+turn off millimode by entering "shift+a". However, millimode is currently activated by pressing
+"enter" and cannot be turned off via the Termite terminal. During millimode, the transmitter only
+prints out a placeholder of @7 next to every data entry. Rick plans to finish millimode by next Thursday.
