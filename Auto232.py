@@ -8,9 +8,11 @@ def readFile(logs):
     logs - list of list of str, empty, will contain all session information
     """
     with open("BeltMovement", "r") as file:
+        # Use 'with open' for automatic file closing
         Lines = file.readlines()
         temp = ""  # Meant for the first fragmented entry
         for line in Lines:
+            # Any [0:-1] in this function is for removing the newline chr
             if (line == "\n") or (line.__contains__("*")):
                 # Skip empty lines and * placeholder lines
                 pass
@@ -30,7 +32,7 @@ def readFile(logs):
                 # Record the entry
                 logs[-1].append(line[0:-1])
 
-    for log in logs:
+    for log in logs:  # Check each session
         checkValidity(log)
 
 def checkValidity(log):
@@ -51,14 +53,14 @@ def checkValidity(log):
         entry = line.split()  # Separate time and data
         if line == log[1]:  # Set state depending on first data entry
             if entry[1] == "1":
-                state = "High"
-            elif entry[1] == "0":
                 state = "Low"
+            elif entry[1] == "0":
+                state = "High"
 
-        if (entry[1] == "1") and (state == "High"):  # Confirm a 1
-            state = "Low"  # Now expecting a 0 next
-        elif (entry[1] == "0") and (state == "Low"):  # Confirm a 0
-            state = "High"  # Now expecting a 1 next
+        if (entry[1] == "1") and (state == "Low"):  # Confirm a 1
+            state = "High"  # Now expecting a 0 next
+        elif (entry[1] == "0") and (state == "High"):  # Confirm a 0
+            state = "Low"  # Now expecting a 1 next
         elif entry[1] == "3":  # This won't be handled in this function
             pass
         else:  # Occurs if the transmitted data is unrecognized
@@ -122,23 +124,20 @@ def analyzeData(log):
         entry = line.split()  # Separate time and data
         if line == log[1]:  # On the first entry
             prevTime = entry[0]  # Set prevTime
-
         else:  # Update end
             end = entry[0]
             TD = timeDiff(prevTime[0:-1], end[0:-1])
-            if entry[1] == "1":  # Reached end of chain
-                begin = moveDetector(TD, 28.125, SmooveBlocks, begin, prevTime)
-            elif entry[1] == "0":  # Reached end of trolley
-                begin = moveDetector(TD, 2.8125, SmooveBlocks, begin, prevTime)
+            if entry[1] == "1":  # Reached end of chain/start of gap
+                begin = moveDetector(TD, 5.3125, SmooveBlocks, begin, prevTime)
+            elif entry[1] == "0":  # Reached end of gap/start of chain
+                begin = moveDetector(TD, 4.25, SmooveBlocks, begin, prevTime)
             else:  # Connection error
                 pass  # Placeholder
-            prevTime = end
+            prevTime = end  # Update prevTime
 
-        if line == log[-1]:  # On last entry
-            if len(SmooveBlocks[-1]) == 1:  # Complete the interval
-                SmooveBlocks[-1].append(end[0:-1])
-            else:  # Or make it the last interval
-                SmooveBlocks.append([end[0:-1], end[0:-1]])
+        if line == log[-1] and len(SmooveBlocks[-1]) == 1:
+            # On last entry and half interval
+            SmooveBlocks[-1].append(end[0:-1])  # [0:-1] doesn't include :
 
     return SmooveBlocks
 
@@ -150,36 +149,43 @@ def toExcel(logs, xlData):
     """
     #try:
         #wb = openpyxl.load_workbook('AutoLine_Weekly_Report.xlsx')
+        # Opening the prior excel sheet would require a few things.
+        # First, the ability to find it with or without a date marker.
+        # Second, this function would have to append new data without
+        # overwriting old data.
     #except:
     wb = openpyxl.Workbook()  # Create a new workbook
     ws = wb.active  # Set only sheet as active
     row_num = 1  # Will change to cover many rows, starts as first row
     ws.cell(row=row_num, column=1).value = "All intervals represent periods of movement"
+    ws.cell(row=row_num+1, column=1).value = "HH:MM:SS.SS in military time"
+    row_num += 3  # Get ready to write in sessions
     for x in range(len(logs)):  # For each session
         stamp = re.split("Termite log, started at ", logs[x][0])[1]  # Time stamp
-        ws.cell(row=row_num+2, column=1).value = stamp
-        ws.cell(row=row_num+3, column=1).value = "HH:MM:SS.SS in military time"
-        row_num += 3  # Update row_num to reach right before next empty row
+        ws.cell(row=row_num, column=1).value = stamp
+        row_num += 1  # Get ready to write in data
 
         data = xlData[x]  # Data for only one session
         if data:  # If there's something
             count = len(data)  # Amount of intervals
-            for i in range(1, count+1):  # For each interval
-                B = data[i-1][0]  # Beginning of interval
-                E = data[i-1][1]  # Ending of interval
+            for i in range(count):  # For each interval
+                B = data[i][0]  # Beginning of interval
+                E = data[i][1]  # Ending of interval
                 ws.cell(row=row_num+i, column=1).value = B + "-" + E
-        row_num += count  # Update row_num to pass all recently filled rows
+            row_num += count + 1  # Update row_num to pass all recently filled rows
+        else:
+            row_num += 1
     
     date = time.strftime("%D", time.localtime())  # Get MM/DD/YYYY
     date = re.sub("/", "_", date)  # Replace / with _ for valid name
     name = "AutoLine_Weekly_Report_" + date + ".xlsx"
-    wb.save(name)  # save changes
+    wb.save(name)  # Save changes
 
 def main():
     logs = []
     xlData = []
     readFile(logs)
-    for log in logs:
+    for log in logs:  # Cycle through each session
         xlData.append(analyzeData(log))
     toExcel(logs, xlData)
 
