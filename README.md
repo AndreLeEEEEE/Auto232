@@ -120,3 +120,4 @@ third change is still a work in progress. The plan is to turn on millimode by en
 turn off millimode by entering "shift+a". However, millimode is currently activated by pressing
 "enter" and cannot be turned off via the Termite terminal. During millimode, the transmitter only
 prints out a placeholder of @7 next to every data entry. Rick plans to finish millimode by next Thursday.
+The program has also been refactored to account for the newly calculated time frames.
