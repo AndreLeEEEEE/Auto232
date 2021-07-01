@@ -121,3 +121,20 @@ turn off millimode by entering "shift+a". However, millimode is currently activa
 "enter" and cannot be turned off via the Termite terminal. During millimode, the transmitter only
 prints out a placeholder of @7 next to every data entry. Rick plans to finish millimode by next Thursday.
 The program has also been refactored to account for the newly calculated time frames.
+
+Update 7/1/2021: A few changes have been made to the hardware and a few changes are planned for the 
+hardware. What I previously called millimode, now called time mode, has been implemented and it prints
+out the amount of time in seconds-down to the millisecond-that has passed since the last 0/1. Time
+mode is activated by entering a capital 'A' and deactivated by entering a lowercase 'a'. The printed
+time is one whitespace away from the 0/1 and is 5 characters long. The first two characters are seconds
+and the last three characters are fractional seconds. At the moment, the hardware no longer transmits
+a 3 for error. The new baud rate is also 19200. As for the planned changes, the most important one is
+overflow handling. As with all hardware, there's only so much memory allocated for variables. The
+printed counter from time mode only goes as high as around 65.539 seconds. Overflows occurs when the
+counter goes higher than this and it'll loop back to 0 seconds. This is an issue since an overflow that
+results in a number that fits the time frame shouldn't be valid. Rick's solution to this is to output
+a 03 everytime the counter overflows. This would result in scenarios where the belt is down for a
+certain amount of minutes, so the hardware would recognize that can output an amount of 03's equal to
+the minutes spent inactive. The last two planned changes are to print out a decimal point in the time
+between the whole and fractional seconds and to activate time mode from start-up. These modifications
+could be finished by tomorrow.
