@@ -137,6 +137,6 @@ a 03 everytime the counter overflows. This would result in scenarios where the b
 certain amount of minutes, so the hardware would recognize that can output an amount of 03's equal to
 the minutes spent inactive. The last two planned changes are to print out a decimal point in the time
 between the whole and fractional seconds and to activate time mode from start-up. These modifications
-could be finished by tomorrow. Last, time mode's implementation would render Termite's time add-on
-and the program's timeDiff function unnecessary since the difference in time between 0's and 1's will
-be in the log file.
+could be finished by tomorrow. Last, time mode's implementation would render some of the program's 
+functions unnecessary since the difference in time between 0's and 1's will be in the log file.
+However, Termite's time stamp add-on is still needed for its extra detail.
