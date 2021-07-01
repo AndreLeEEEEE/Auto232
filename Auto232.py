@@ -46,7 +46,7 @@ def checkValidity(log):
     if len(log) == 1: return  # A stamp but no entries
 
     for line in log[1:]:  # Starting after the session info stamp
-        entry = line.split()  # Separate time and data
+        entry = line.split()  # Separate time stamp, data, and time
         if line == log[1]:  # Set state depending on first data entry
             if entry[1] == "1": state = "Low"
             elif entry[1] == "0": state = "High"
