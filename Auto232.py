@@ -50,16 +50,7 @@ def checkValidity(log):
         if line == log[1]:  # Set state depending on first data entry
             if entry[1] == "1": state = "Low"
             elif entry[1] == "0": state = "High"
-
-        if (entry[1] == "1") and (state == "Low"): state = "High"
-            # Confirm a 1, now expecting a 0 next
-        elif (entry[1] == "0") and (state == "High"): state = "Low"
-            # Confirm a 0, now expecting a 1 next
-        elif entry[1] == "3": pass
-            # This won't be handled in this function
-        else:  # Occurs if the transmitted data is unrecognized
-            raise Exception("Unrecognized data in session: {}".format(log[0]))
-
+        # Check time stamps
         if line == log[1]: pTime = entry[0]
             # Set pTime if first entry
         else:  # Update cTime
@@ -68,28 +59,43 @@ def checkValidity(log):
                 raise Exception("Time error in session: {}".format(log[0]))
             else: pTime = cTime
                 # Update pTime when check passed
+        # Check data
+        if (entry[1] == "1") and (state == "Low"): state = "High"
+            # Confirm a 1, now expecting a 0 next
+        elif (entry[1] == "0") and (state == "High"): state = "Low"
+            # Confirm a 0, now expecting a 1 next
+        elif entry[1] == "03": pass
+            # This won't be handled in this function
+        else:  # Occurs if the transmitted data is unrecognized
+            raise Exception("Unrecognized data in session: {}".format(log[0]))
+        # Check time
+        if (len(entry[2]) != 7  # 7 to include newline character
+            or entry[2][2] != '.'
+            or not entry[2][0:2].isdigit()
+            or not entry[2][3:].isdigit()):
+            raise Exception("Incorrect time mode format in session: {}".format(log[0]))
 
-def timeDiff(time1, time2):
-    """Compare two times and return the difference in seconds."""
-    """
-    time1 - str, a time in HH:MM:SS.SS format, supposed to be earlier
-    time2 - str, a time in HH:MM:SS.SS format, supposed to be later
-    """
-    time1 = time1.split(":")
-    time2 = time2.split(":")
+#def timeDiff(time1, time2):
+#    """Compare two times and return the difference in seconds."""
+#    """
+#    time1 - str, a time in HH:MM:SS.SS format, supposed to be earlier
+#    time2 - str, a time in HH:MM:SS.SS format, supposed to be later
+#    """
+#    time1 = time1.split(":")
+#    time2 = time2.split(":")
 
-    hours = float(time2[0]) - float(time1[0])
-    minutes = float(time2[1]) - float(time1[1])
-    seconds = float(time2[2]) - float(time1[2])
+#    hours = float(time2[0]) - float(time1[0])
+#    minutes = float(time2[1]) - float(time1[1])
+#    seconds = float(time2[2]) - float(time1[2])
 
-    seconds += hours * 60 * 60
-    seconds += minutes * 60
-    return seconds
+#    seconds += hours * 60 * 60
+#    seconds += minutes * 60
+#    return seconds
 
 def moveDetector(diff, period, moveBlocks, start, pTime):
     """Check if the belt is moving or stopped."""
     """
-    diff - float, difference in seconds between current time and pTime
+    diff - float, amount of time passed since last data
     period - diff, amount seconds to compare diff to 
     moveBlocks - list of list of str, stores intervals of movement
     start - str, time when the belt started moving
@@ -116,17 +122,17 @@ def analyzeData(log):
     SmooveBlocks = []
     for line in log[1:]:  # Go through each entry
         entry = line.split()  # Separate time and data
-        if line == log[1]: prevTime = entry[0]
+        if line == log[1]: prevTime = entry[0][0:-1]  # Exclude ending ':'
             # On the first entry, set prevTime
         else:  # Update end
-            end = entry[0]
-            TD = timeDiff(prevTime[0:-1], end[0:-1])
+            end = entry[0][0:-1]
+            #TD = timeDiff(prevTime, end)
             if entry[1] == "1":  # Reached end of chain/start of gap
-                begin = moveDetector(TD, 5.3125, SmooveBlocks, begin, prevTime)
+                begin = moveDetector(entry[2][0:-1], 5.3125, SmooveBlocks, begin, prevTime)
             elif entry[1] == "0":  # Reached end of gap/start of chain
-                begin = moveDetector(TD, 4.25, SmooveBlocks, begin, prevTime)
+                begin = moveDetector(entry[2][0:-1], 4.25, SmooveBlocks, begin, prevTime)
             else: pass
-                # Connection error
+                # Stoppage
             prevTime = end  # Update prevTime
 
         if line == log[-1] and len(SmooveBlocks[-1]) == 1:
@@ -146,7 +152,7 @@ def toExcel(logs, xlData):
         # Opening the prior excel sheet would require a few things.
         # First, the ability to find it with or without a date marker.
         # Second, this function would have to append new data without
-        # overwriting old data.
+        # overwriting old data. Ask Alex what he prefers.
     #except:
     wb = openpyxl.Workbook()  # Create a new workbook
     ws = wb.active  # Set only sheet as active
