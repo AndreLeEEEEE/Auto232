@@ -1,7 +1,7 @@
 import openpyxl  # Needed for Excel
 import re  # Needed for special splits and sub
 import time  # Needed for dates
-
+# Approved
 def readFile(logs):
     """Extract the log data and make it usable."""
     """
@@ -17,8 +17,8 @@ def readFile(logs):
                 # Skip empty lines and * placeholder lines
             elif line.__contains__("Termite log"): logs.append([line[0:-1]])
                 # Add a new session when the log marks a new session
-            elif len(line[0:-1]) == 1: temp = line[0:-1]
-                # Store the fragmented entry for laters
+            elif ':' not in line: temp = line[0:-1]
+                # Store the fragmented entry for later
             elif temp:
                 # Gather the fragments and record the complete entry
                 logs[-1].append(line.split(" ", 1)[0] + " " + temp)
@@ -30,7 +30,7 @@ def readFile(logs):
 
     for log in logs:  # Check each session
         checkValidity(log)
-
+# Approved? Needs edits if time isn't in military format
 def checkValidity(log):
     """Make sure there's nothing syntactically wrong with the data."""
     """
@@ -47,12 +47,12 @@ def checkValidity(log):
 
     for line in log[1:]:  # Starting after the session info stamp
         entry = line.split()  # Separate time stamp, data, and time
-        if line == log[1]:  # Set state depending on first data entry
+        if not state:  # Set state depending on first data entry
             if entry[1] == "1": state = "Low"
             elif entry[1] == "0": state = "High"
         # Check time stamps
-        if line == log[1]: pTime = entry[0]
-            # Set pTime if first entry
+        if line == log[1]:  # Set pTime on first entry
+                pTime = entry[0]
         else:  # Update cTime
             cTime = entry[0]
             if pTime > cTime:  # If pTime is later than cTime
@@ -60,37 +60,20 @@ def checkValidity(log):
             else: pTime = cTime
                 # Update pTime when check passed
         # Check data
+        if not state: continue  # Waiting for a state
         if (entry[1] == "1") and (state == "Low"): state = "High"
             # Confirm a 1, now expecting a 0 next
         elif (entry[1] == "0") and (state == "High"): state = "Low"
             # Confirm a 0, now expecting a 1 next
-        elif entry[1] == "03": pass
-            # This won't be handled in this function
+        elif entry[1] == "3": continue  # To prevent indexing error
         else:  # Occurs if the transmitted data is unrecognized
             raise Exception("Unrecognized data in session: {}".format(log[0]))
         # Check time
-        if (len(entry[2]) != 7  # 7 to include newline character
+        if (len(entry[2]) != 6  # 6 doesn't include newline
             or entry[2][2] != '.'
             or not entry[2][0:2].isdigit()
             or not entry[2][3:].isdigit()):
             raise Exception("Incorrect time mode format in session: {}".format(log[0]))
-
-#def timeDiff(time1, time2):
-#    """Compare two times and return the difference in seconds."""
-#    """
-#    time1 - str, a time in HH:MM:SS.SS format, supposed to be earlier
-#    time2 - str, a time in HH:MM:SS.SS format, supposed to be later
-#    """
-#    time1 = time1.split(":")
-#    time2 = time2.split(":")
-
-#    hours = float(time2[0]) - float(time1[0])
-#    minutes = float(time2[1]) - float(time1[1])
-#    seconds = float(time2[2]) - float(time1[2])
-
-#    seconds += hours * 60 * 60
-#    seconds += minutes * 60
-#    return seconds
 
 def moveDetector(diff, period, moveBlocks, start, pTime):
     """Check if the belt is moving or stopped."""
