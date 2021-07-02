@@ -30,7 +30,7 @@ def readFile(logs):
 
     for log in logs:  # Check each session
         checkValidity(log)
-# Approved? Needs edits if time isn't in military format
+# Approved
 def checkValidity(log):
     """Make sure there's nothing syntactically wrong with the data."""
     """
