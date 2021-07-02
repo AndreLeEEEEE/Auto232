@@ -140,3 +140,12 @@ between the whole and fractional seconds and to activate time mode from start-up
 could be finished by tomorrow. Last, time mode's implementation would render some of the program's 
 functions unnecessary since the difference in time between 0's and 1's will be in the log file.
 However, Termite's time stamp add-on is still needed for its extra detail.
+
+Update 7/2/2022: The decimal point was added to time mode to help differentiate what's a whole second
+and what's a fractional second. In addition, the hardware was changed so time mode would already be 
+activated on start-up. The overflow signal has been implemented and now a 3 will be transmitted when
+the counter exceeds roughly 65 seconds. This signal comes with a time stamp but no time. I refactored
+all of the relevant sections in the program and tested them. Everything is be working as intended 
+on the software side. Now on the hardware side, Rick is planning to embed a strain of the detector in
+a 3D printed "case". The metal bracket that's supposed to hold up the detector didn't exactly fit, so
+we're also waiting on that to be remade.
