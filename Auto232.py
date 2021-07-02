@@ -74,7 +74,7 @@ def checkValidity(log):
             or not entry[2][0:2].isdigit()
             or not entry[2][3:].isdigit()):
             raise Exception("Incorrect time mode format in session: {}".format(log[0]))
-# Approved?
+# Approved
 def moveDetector(diff, period, moveBlocks, start, pTime):
     """Check if the belt is moving or stopped."""
     """
@@ -84,7 +84,7 @@ def moveDetector(diff, period, moveBlocks, start, pTime):
     start - str, time when the belt started moving
     pTime - str, previous time
     """
-    if diff < period:  # If smoovin
+    if float(diff) < period:  # If smoovin
         if not start:  # Start of movement interval
             start = pTime  # Set start
             moveBlocks.append([start])  # Record start of interval
@@ -93,7 +93,7 @@ def moveDetector(diff, period, moveBlocks, start, pTime):
             moveBlocks[-1].append(pTime)  # Record end of interval
             start = ""  # Clear start
     return start
-
+# Approved
 def analyzeData(log):
     """Return when/for how long the belt moved and stopped."""
     """
@@ -124,7 +124,7 @@ def analyzeData(log):
             SmooveBlocks[-1].append(end)
 
     return SmooveBlocks
-
+# Approved
 def toExcel(logs, xlData):
     """Make Excel workbook with data."""
     """
@@ -164,7 +164,7 @@ def toExcel(logs, xlData):
     date = re.sub("/", "_", date)  # Replace / with _ for valid name
     name = "AutoLine_Weekly_Report_" + date + ".xlsx"
     wb.save(name)  # Save changes
-
+# Approved
 def main():
     logs = []
     xlData = []
