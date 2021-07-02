@@ -74,7 +74,7 @@ def checkValidity(log):
             or not entry[2][0:2].isdigit()
             or not entry[2][3:].isdigit()):
             raise Exception("Incorrect time mode format in session: {}".format(log[0]))
-
+# Approved?
 def moveDetector(diff, period, moveBlocks, start, pTime):
     """Check if the belt is moving or stopped."""
     """
@@ -87,10 +87,10 @@ def moveDetector(diff, period, moveBlocks, start, pTime):
     if diff < period:  # If smoovin
         if not start:  # Start of movement interval
             start = pTime  # Set start
-            moveBlocks.append([start[0:-1]])  # Record start of interval
+            moveBlocks.append([start])  # Record start of interval
     else:  # If stoppin
         if start:  # End of movement interval
-            moveBlocks[-1].append(pTime[0:-1])  # Record end of interval
+            moveBlocks[-1].append(pTime)  # Record end of interval
             start = ""  # Clear start
     return start
 
@@ -109,18 +109,19 @@ def analyzeData(log):
             # On the first entry, set prevTime
         else:  # Update end
             end = entry[0][0:-1]
-            #TD = timeDiff(prevTime, end)
             if entry[1] == "1":  # Reached end of chain/start of gap
-                begin = moveDetector(entry[2][0:-1], 5.3125, SmooveBlocks, begin, prevTime)
+                begin = moveDetector(entry[2], 5.3125, SmooveBlocks, begin, prevTime)
             elif entry[1] == "0":  # Reached end of gap/start of chain
-                begin = moveDetector(entry[2][0:-1], 4.25, SmooveBlocks, begin, prevTime)
+                begin = moveDetector(entry[2], 4.25, SmooveBlocks, begin, prevTime)
+            elif entry[1] == "3":  # Instant stoppage
+                begin = moveDetector(1, 0, SmooveBlocks, begin, prevTime)
             else: pass
                 # Stoppage
             prevTime = end  # Update prevTime
 
         if line == log[-1] and len(SmooveBlocks[-1]) == 1:
             # On last entry and half interval
-            SmooveBlocks[-1].append(end[0:-1])  # [0:-1] doesn't include :
+            SmooveBlocks[-1].append(end)
 
     return SmooveBlocks
 
