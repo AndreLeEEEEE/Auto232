@@ -1,6 +1,7 @@
 import openpyxl  # Needed for Excel
 import re  # Needed for special splits and sub
 import time  # Needed for dates
+from datetime import timedelta  # Needed for time calculations
 # Approved
 def readFile(logs):
     """Extract the log data and make it usable."""
@@ -75,30 +76,31 @@ def checkValidity(log):
             or not entry[2][3:].isdigit()):
             raise Exception("Incorrect time mode format in session: {}".format(log[0]))
 # Approved
-def moveDetector(diff, period, moveBlocks, start, pTime):
-    """Check if the belt is moving or stopped."""
-    """
-    diff - float, amount of time passed since last data
-    period - diff, amount seconds to compare diff to 
-    moveBlocks - list of list of str, stores intervals of movement
-    start - str, time when the belt started moving
-    pTime - str, previous time
-    """
-    if float(diff) < period:  # If smoovin
-        if not start:  # Start of movement interval
-            start = pTime  # Set start
-            moveBlocks.append([start])  # Record start of interval
-    else:  # If stoppin
-        if start:  # End of movement interval
-            moveBlocks[-1].append(pTime)  # Record end of interval
-            start = ""  # Clear start
-    return start
-# Approved
 def analyzeData(log):
     """Return when/for how long the belt moved and stopped."""
     """
     log - list of str, contains session info and entries
     """
+    # Approved
+    def moveDetector(diff, period, moveBlocks, start, pTime):
+        """Check if the belt is moving or stopped."""
+        """
+        diff - float, amount of time passed since last data
+        period - diff, amount seconds to compare diff to 
+        moveBlocks - list of list of str, stores intervals of movement
+        start - str, time when the belt started moving
+        pTime - str, previous time
+        """
+        if float(diff) < period:  # If smoovin
+            if not start:  # Start of movement interval
+                start = pTime  # Set start
+                moveBlocks.append([start])  # Record start of interval
+        else:  # If stoppin
+            if start:  # End of movement interval
+                moveBlocks[-1].append(pTime)  # Record end of interval
+                start = ""  # Clear start
+        return start
+
     begin = ""  # Holds time that starts a state
     end = ""  # Holds time that ends a state, doubles as current time
     prevTime = ""  # Holds previous time
@@ -131,13 +133,23 @@ def toExcel(logs, xlData):
     logs - list of list of str, contains all session information
     xlData - list of list of str, moving intervals for every session
     """
-    #try:
-        #wb = openpyxl.load_workbook('AutoLine_Weekly_Report.xlsx')
-        # Opening the prior excel sheet would require a few things.
-        # First, the ability to find it with or without a date marker.
-        # Second, this function would have to append new data without
-        # overwriting old data. Ask Alex what he prefers.
-    #except:
+    def timeDiff(aTime, bTime):
+        """Return the difference in times."""
+        """
+        aTime - str, an earlier time
+        bTime - str, a later time
+        """
+        aTemp = aTime.split(":")
+        bTemp = bTime.split(":")
+        aTD = timedelta(hours=int(aTemp[0]), minutes=int(aTemp[1]), seconds=float(aTemp[2]))
+        bTD = timedelta(hours=int(bTemp[0]), minutes=int(bTemp[1]), seconds=float(bTemp[2]))
+        c = bTD - aTD
+        min = c.total_seconds() // 60  # Total minutes without remainder
+        r_sec = c.total_seconds() % 60  # Remaining seconds
+        hr = min // 60  # Total hours without remainder
+        r_min = min % 60  # Remaining minutes
+        return [hr, r_min, r_sec]
+
     wb = openpyxl.Workbook()  # Create a new workbook
     ws = wb.active  # Set only sheet as active
     row_num = 1  # Will change to cover many rows, starts as first row
@@ -156,6 +168,9 @@ def toExcel(logs, xlData):
                 B = data[i][0]  # Beginning of interval
                 E = data[i][1]  # Ending of interval
                 ws.cell(row=row_num+i, column=1).value = B + "-" + E
+                inter_tol = timeDiff(B, E)
+                ws.cell(row=row_num+i, column=2).value = ("Hours: {}, Minutes: {}, Seconds: {}"
+                                                          .format(inter_tol[0], inter_tol[1], inter_tol[2]))
             row_num += count + 1  # Update row_num to pass all recently filled rows
         else:
             row_num += 1
