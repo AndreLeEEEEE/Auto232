@@ -149,3 +149,6 @@ all of the relevant sections in the program and tested them. Everything is be wo
 on the software side. Now on the hardware side, Rick is planning to embed a strain of the detector in
 a 3D printed "case". The metal bracket that's supposed to hold up the detector didn't exactly fit, so
 we're also waiting on that to be remade.
+
+Update 7/6/2021: Apparently we won't need the bracket to hold the hardware in place. The installation
+will be handled by something else. 
