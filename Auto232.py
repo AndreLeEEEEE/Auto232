@@ -165,8 +165,20 @@ def toExcel(logs, xlData):
         total_s = total_s % 60  # Adjust seconds
         total_hr += total_min // 60  # Take any hours from minutes
         total_min = total_min % 60  # Adjust minutes
-
-        return "Daily Total: {}:{}:{}".format(total_hr, total_min, total_s)
+        return [total_hr, total_min, total_s]
+    def stopTime(dailyMove):
+        """Return the daily total of stop time."""
+        """
+        dailyMove - list of float, the daily total of move time
+        """
+        whole_day = timedelta(hours=10, minutes=30, seconds=0)  # 6:00 am to 4:30 pm
+        DM = timedelta(hours=dailyMove[0], minutes=dailyMove[1], seconds=dailyMove[2])
+        c = whole_day - DM
+        min = c.total_seconds() // 60  # Total minutes without remainder
+        r_sec = c.total_seconds() % 60  # Remaining seconds
+        hr = min // 60  # Total hours without remainder
+        r_min = min % 60  # Remaining minutes
+        return [hr, r_min, r_sec]
 
     wb = openpyxl.Workbook()  # Create a new workbook
     ws = wb.active  # Set only sheet as active
@@ -188,10 +200,17 @@ def toExcel(logs, xlData):
                 ws.cell(row=row_num+i, column=1).value = B + "-" + E
                 inter = timeDiff(B, E)  # Get duration
                 times.append(inter)
-                ws.cell(row=row_num+i, column=4).value = ("Hours: {}, Minutes: {}, Seconds: {}"
-                                                          .format(inter[0], inter[1], inter[2]))
-            ws.cell(row=row_num+count, column=4).value = tolTime(times)  # Daily total
-            row_num += count + 1  # Update row_num to pass all recently filled rows
+                temp_str = ("Hours: {}, Minutes: {}, Seconds: {}"
+                            .format(inter[0], inter[1], inter[2]))
+                ws.cell(row=row_num+i, column=4).value = temp_str
+            # Do the below for each session
+            mTol = tolTime(times)  # Daily total movement time
+            temp_str = "Daily move time: {}:{}:{}".format(mTol[0], mTol[1], mTol[2])
+            ws.cell(row=row_num+count, column=4).value = temp_str
+            sTol = stopTime(mTol)  # Daily total stop time
+            temp_str = "Daily stop time: {}:{}:{}".format(sTol[0], sTol[1], sTol[2])
+            ws.cell(row=row_num+count+1, column=4).value = temp_str
+            row_num += count + 2  # Update row_num to pass all recently filled rows
         else: row_num += 1
     
     date = time.strftime("%D", time.localtime())  # Get MM/DD/YYYY
@@ -208,3 +227,4 @@ def main():
     toExcel(logs, xlData)
 
 main()
+# Assume the workday is from 6:00 am to 4:30pm
