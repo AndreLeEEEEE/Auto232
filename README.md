@@ -151,4 +151,5 @@ a 3D printed "case". The metal bracket that's supposed to hold up the detector d
 we're also waiting on that to be remade.
 
 Update 7/6/2021: Apparently we won't need the bracket to hold the hardware in place. The installation
-will be handled by something else. 
+will be handled by something else. I've implemented an additional feature that displays the duration of
+each interval and the daily total movement time.
