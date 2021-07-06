@@ -149,6 +149,24 @@ def toExcel(logs, xlData):
         hr = min // 60  # Total hours without remainder
         r_min = min % 60  # Remaining minutes
         return [hr, r_min, r_sec]
+    def tolTime(day):
+        """Return the daily total of movement time."""
+        """
+        day - list of list of float, each list is an interval's duration
+        """
+        total_hr = 0
+        total_min = 0
+        total_s = 0.0
+        for session in day:
+            total_hr += session[0]
+            total_min += session[1]
+            total_s += session[2]
+        total_min += total_s // 60  # Take any minutes from seconds
+        total_s = total_s % 60  # Adjust seconds
+        total_hr += total_min // 60  # Take any hours from minutes
+        total_min = total_min % 60  # Adjust minutes
+
+        return "Daily Total: {}:{}:{}".format(total_hr, total_min, total_s)
 
     wb = openpyxl.Workbook()  # Create a new workbook
     ws = wb.active  # Set only sheet as active
@@ -160,7 +178,7 @@ def toExcel(logs, xlData):
         stamp = re.split("Termite log, started at ", logs[x][0])[1]  # Time stamp
         ws.cell(row=row_num, column=1).value = stamp
         row_num += 1  # Get ready to write in data
-
+        times = []  # Needed for daily total
         data = xlData[x]  # Data for only one session
         if data:  # If there's something
             count = len(data)  # Amount of intervals
@@ -168,12 +186,13 @@ def toExcel(logs, xlData):
                 B = data[i][0]  # Beginning of interval
                 E = data[i][1]  # Ending of interval
                 ws.cell(row=row_num+i, column=1).value = B + "-" + E
-                inter_tol = timeDiff(B, E)
-                ws.cell(row=row_num+i, column=2).value = ("Hours: {}, Minutes: {}, Seconds: {}"
-                                                          .format(inter_tol[0], inter_tol[1], inter_tol[2]))
+                inter = timeDiff(B, E)  # Get duration
+                times.append(inter)
+                ws.cell(row=row_num+i, column=4).value = ("Hours: {}, Minutes: {}, Seconds: {}"
+                                                          .format(inter[0], inter[1], inter[2]))
+            ws.cell(row=row_num+count, column=4).value = tolTime(times)  # Daily total
             row_num += count + 1  # Update row_num to pass all recently filled rows
-        else:
-            row_num += 1
+        else: row_num += 1
     
     date = time.strftime("%D", time.localtime())  # Get MM/DD/YYYY
     date = re.sub("/", "_", date)  # Replace / with _ for valid name
