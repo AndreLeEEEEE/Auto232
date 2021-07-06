@@ -152,4 +152,13 @@ we're also waiting on that to be remade.
 
 Update 7/6/2021: Apparently we won't need the bracket to hold the hardware in place. The installation
 will be handled by something else. I've implemented an additional feature that displays the duration of
-each interval and the daily total movement time.
+each interval and the daily total movement time. Alex has approved of the new excel sheet look and has 
+"expanded the scope" of the project. The last addition that needs to be made to the original program 
+is the daily total stoppage time. This will be calculated by subtracting the daily total movement time
+from the duration of an expected work day, 6:00 am to 4:30 pm. The project's expansion involves the
+real-time display of the line's uptime. Essentially, this new program will keep track of how long the 
+line has been up and down during the entire day. Every minute or so, the amount of time spent
+down (in minutes) is divided by the amount of time spent up (also in minutes). This quotent is
+subtracted from 1 and multipled by 100% to give the uptime ratio. The purpose of this new program is
+to allow passer-by-er's such as Alex or Michael to see if the line is currently doing well or not.
+For example, an uptime ratio that's below 80% will prompt a "talk".
