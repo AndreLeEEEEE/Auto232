@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AutoLine Runtime</title>
+<style>
+    div.grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, 1fr);
+    }
+    p {
+        font-size: 60px;
+        text-align: center;
+    }
+    progress {
+        width: 100%;
+    }
+</style>
+</head>
+<body>
+    <div class="grid">
+        <p id="Date"></p>
+        <div>
+            <label for="Move">Minutes Running: </label>
+            <progress id="Move" value="500" max="630"></progress>
+        </div>
+        <div>
+            <label for="Stop">Minutes Halted: </label>
+            <progress id="Stop" value="400" max="630"></progress>
+        </div>
+    </div>
+<script>
+    let real_minutes = 0
+    setInterval(function() {  // Function is defined within setInterval so it updates in real time
+        ++real_minutes
+        let d = new Date()
+        document.getElementById("Date").innerHTML = d
+    }, 1000)
+</script>
+</body>
+</html>
