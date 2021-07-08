@@ -6,7 +6,7 @@
     div.grid {
         display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: repeat(3, 1fr);
+        grid-template-rows: repeat(4, 1fr);
     }
     p {
         font-size: 60px;
@@ -14,27 +14,58 @@
     }
     progress {
         width: 100%;
+        height: 50px;
+        appearance: none;
     }
+    /*The color of the bar itself*/
+    progress::-webkit-progress-bar {
+        background: rgb(240, 234, 234);
+    }
+    /*The colors of the bars' progress*/
+    progress#Move::-webkit-progress-value {
+        background: greenyellow;
+    }
+    progress#Stop::-webkit-progress-value {
+        background: red;
+    }
+    
 </style>
 </head>
 <body>
     <div class="grid">
         <p id="Date"></p>
         <div>
-            <label for="Move">Minutes Running: </label>
-            <progress id="Move" value="500" max="630"></progress>
+            <label id="mValue" for="Move">Minutes Running: 0</label>
+            <progress id="Move" value="0" max="630"></progress>
         </div>
         <div>
-            <label for="Stop">Minutes Halted: </label>
-            <progress id="Stop" value="400" max="630"></progress>
+            <label id="sValue" for="Stop">Minutes Halted: 0</label>
+            <progress id="Stop" value="0" max="630">Beet</progress>
         </div>
     </div>
 <script>
-    let real_minutes = 0
-    setInterval(function() {  // Function is defined within setInterval so it updates in real time
-        ++real_minutes
+    let real_min = -1
+    let smoove = false
+    let timer = setInterval(function() {  // Function is defined within setInterval so it updates in real time
         let d = new Date()
         document.getElementById("Date").innerHTML = d
+        
+        ++real_min
+        if (smoove) {
+            document.getElementById("Move").setAttribute("value", real_min)
+            document.getElementById("mValue").innerHTML = "Minutes Running: " + real_min
+        }
+        else {
+            document.getElementById("Stop").setAttribute("value", real_min)
+            document.getElementById("sValue").innerHTML = "Minutes Halted: " + real_min
+        }
+
+        let y = document.getElementById("Move").getAttribute("value")
+        let z = document.getElementById("Stop").getAttribute("value")
+
+        if (real_min === 630) {
+            clearInterval(timer)
+        }
     }, 1000)
 </script>
 </body>
