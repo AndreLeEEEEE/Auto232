@@ -162,3 +162,20 @@ down (in minutes) is divided by the amount of time spent up (also in minutes). T
 subtracted from 1 and multipled by 100% to give the uptime ratio. The purpose of this new program is
 to allow passer-by-er's such as Alex or Michael to see if the line is currently doing well or not.
 For example, an uptime ratio that's below 80% will prompt a "talk".
+
+Update 7/8/2021: index.html has everything except for file related stuff. The page displays the current
+date and time, running progress bar, halted progress bar, and uptime ratio. The statements to update
+the bars and calculate the ratio are there, but they don't work off of the log file yet. I need to 
+find a way to read the Termite log file into Javascript so I can look at the current data. Although
+the progress bars are updated by the minute, I think I'd have to check the log file every few seconds.
+This is because checking every minute means I'd have to account for different cases. Within a minute,
+the belt could be constantly moving, constantly halted, moving at first and then halted, or halted at 
+first and then moving. Originally, I thought that if checked every minute, a moving belt would be 
+denoted by at least ten new entries since the last minute. However, this could be achieved by movement
+at a consistent speed or extreme fluctuations of speed. An example of the latter plays out as such. 
+For the first half of the minute, the belt is moving so fast that at least ten new entries are recorded 
+in the log file. During the second half of the minute, the belt stops. Since there are new entries, the 
+move bar will be incremented even though the line obviously stopped. When the log file is checked every 
+few seconds, the interval for movement is shorter and numerous (i.e. interval of one minute vs 15 
+intervals of four seconds). If the majority of these smaller intervals, 80% or so, registered movement,
+then the move bar will go up. If below 80%, the halt bar goes up.
