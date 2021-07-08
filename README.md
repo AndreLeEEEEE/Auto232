@@ -178,4 +178,7 @@ in the log file. During the second half of the minute, the belt stops. Since the
 move bar will be incremented even though the line obviously stopped. When the log file is checked every 
 few seconds, the interval for movement is shorter and numerous (i.e. interval of one minute vs 15 
 intervals of four seconds). If the majority of these smaller intervals, 80% or so, registered movement,
-then the move bar will go up. If below 80%, the halt bar goes up.
+then the move bar will go up. If below 80%, the halt bar goes up. I don't believe that I'd even have to 
+check the time stamps, but I'd have to check the data. Since a 3 corresponds to a halting period,
+determining if an interval has movement based off of a new entry isn't valid. If a new entry isn't 
+detected, it's marked as halted. If a new entry is detected, check the data is see if it's a 3.
