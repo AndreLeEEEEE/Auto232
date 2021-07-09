@@ -8,7 +8,7 @@ def readFile(logs):
     """
     logs - list of list of str, empty, will contain all session information
     """
-    with open("BeltMovement.txt", "r") as file:
+    with open("BeltMovement", "r") as file:
         # Use 'with open' for automatic file closing
         Lines = file.readlines()
         temp = ""  # Meant for the first fragmented entry
