@@ -183,3 +183,15 @@ check the time stamps, but I'd have to check the data. Since a 3 corresponds to 
 determining if an interval has movement based off of a new entry isn't valid. If a new entry isn't 
 detected, it's marked as halted. If a new entry is detected, check the data to see if it's a 3.
 The hardware and software are gonna be set up tomorrow morning.
+
+Update 7/9/2021: Rick has set up the hardware on the line, but he plans to readjust its position.
+As for the software side, I've sent the original program to Alex so he can try to use it next week.
+However, I'm struggling to find a way to make the html page dependent on the data. I've tried the 
+object tag and AJAX to bring the log file into the page. It was successful, but javascript can't 
+recognize the file's contents via attributes like innerHTML or innerText. I could try the fetch
+API since that seems to be a newer version of AJAX, but I'd need more time to learn about it. 
+All of these methods mentioned so far relied on html+javascript to "read in" the log file. If
+I use json or some other really bad work around, I could try to have a python script read in
+and analyze the log file and then send that data to the html page. Finally, I could drop the html
+page entirely and use only python. This would mean the uptime ratio has to be printed out via 
+tkinter because I refuse to print onto command prompt.
