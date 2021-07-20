@@ -200,4 +200,8 @@ Update 7/20/2021: The hardware has been changed to utilize an optical sensor ins
 detector. This modification was made due to the conveyor chain's side-to-side movements that would
 bump into the ferrous sensor. With an optical sensor, the hardware can be placed further from the
 chain. Supposedly, this change won't interfere with the program, leaving little to no refactoring
-necessary. The optical sensor should be swapped in by tomorrow or next Thursday.
+necessary. The optical sensor should be swapped in by tomorrow or next Thursday. I've also completed
+the newest version of index.html. Now, the html file reads in the log file every minute and examines
+the lastest entries. If the entries suggest the line was moving in the past minute, the moving
+progress bar goes up by one. If the entries suggest a halt, the halting progress bar goes up by one.
+The html file hasn't been tested in real-time yet, so there's probably some bugs in it.
