@@ -29,4 +29,6 @@
 
     5.3125 - 4.25 - 5.3125 - 4.25 - 5.3125 - 4.25 - 5.3125 - 4.25 - 5.3125 - 4.25 = 57.375
 
-    If there are at least 10 entries in a minute, the line was moving.
+    Assuming the line is traveling nonstop at its slowest speed, 4 ft/min, there should be 
+    around 10 new entries in the log file per minute. This is the minimum amount of 
+    entries the log file must provide in a minute before the line is deemed halted.
