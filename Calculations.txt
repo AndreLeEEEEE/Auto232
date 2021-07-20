@@ -24,3 +24,9 @@
     Length of gap in double link (estimate) - 80% of total length = 3.4 in
     Time to pass a single link - 5.3125 s
     Time to pass a gap (estimate) - 4.25 s
+
+    s - g - s - g - s - g - s - g - s - g
+
+    5.3125 - 4.25 - 5.3125 - 4.25 - 5.3125 - 4.25 - 5.3125 - 4.25 - 5.3125 - 4.25 = 57.375
+
+    If there are at least 10 entries in a minute, the line was moving.
