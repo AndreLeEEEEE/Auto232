@@ -195,3 +195,9 @@ I use json or some other really bad work around, I could try to have a python sc
 and analyze the log file and then send that data to the html page. Finally, I could drop the html
 page entirely and use only python. This would mean the uptime ratio has to be printed out via 
 tkinter because I refuse to print onto command prompt.
+
+Update 7/20/2021: The hardware has been changed to utilize an optical sensor instead of a ferrous
+detector. This modification was made due to the conveyor chain's side-to-side movements that would
+bump into the ferrous sensor. With an optical sensor, the hardware can be placed further from the
+chain. Supposedly, this change won't interfere with the program, leaving little to no refactoring
+necessary. The optical sensor should be swapped in by tomorrow or next Thursday.
