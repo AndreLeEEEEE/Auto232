@@ -47,33 +47,27 @@
         </div>
         <p id="ratio"></p>
     </div>
+</body>
 <script>
     let real_min = 0  // Keep track of the minutes passed since activation
     let prevLen  // Stores the previous length of the log file
     let smoove  // Will be a boolean, true is movement, false is stop
 
     async function fetchFile(file) {
-        // Return an array of the data
+        // Return an array of the data, each index is a line
         let x = await fetch(file)
         let y = await x.text()
         return y.split("\r\n")
     }
 
-    function isHalt(data) {
-        // Return if the data is 3 or 0/1
-        return Number(data) === 3 ? true : false
-    }
+    fetchFile("Belt.txt").then(function(result) {prevLen = result.length})
+    // Initialize prevLen once
 
-    fetchFile("Belt.txt").then(function(result) {
-        // Initialize prevLen once
-        prevLen = result.length
-    })
+    function isHalt(data) {return Number(data) === 3 ? true : false}
+    // Return if the data is 3 or 0/1
 
-    let clock = setInterval(function() {
-        // Update the time every second
-        let d = new Date()
-        document.getElementById("Date").innerHTML = d
-    }, 1000)
+    let clock = setInterval(function() {document.getElementById("Date").innerHTML = new Date()}, 1000)
+    // Update the time every second
 
     let progress = setInterval(function() {
         // Update the progress bars every minute
@@ -84,10 +78,8 @@
         fetchFile("Belt.txt").then(function(result) {
             // Change smoove based on activity from the past minute
             let curLen = result.length
-            if (curLen - prevLen <= 10) {
-                // The line has halted if there are so few new entries
-                smoove = false
-            }
+            if (curLen - prevLen <= 10) {smoove = false}
+            // The line has halted if there are so few new entries
             else {
                 let recent = curLen - prevLen  // Get the difference in entries
                 let mEntry = skip = 0  // mEntry is amount of moving entries, skip is amount of invalid lines
@@ -99,10 +91,10 @@
                             break
                         case 1:  // Either a session header or starting 3
                             break
-                        case 2:  // Starting move entry
+                        case 2:  // First move entry
                             if (!isHalt(result[-i][0])) {++mEntry}
                             break
-                        case 4:  // The entry after a starting move entry
+                        case 4:  // The entry after a first move entry
                             if (!isHalt(result[-i][26])) {++mEntry}
                             break
                         default:  // Standard entry: timestamp, data, passed secconds
@@ -111,28 +103,31 @@
                 }
                 recent -= skip  // Readjust the difference
                 // Check if at least 80% of the entries in the pass minute indicated movement
-                smoove = mEntry/recent >= 0.8 ? true : false
+                smoove = mEntry/recent >= 0.80 ? true : false
             }
         })
         
-        if (smoove) {
-            Move.setAttribute("value", real_min)
-            document.getElementById("mLabel").innerHTML = `Minutes Running: ${real_min}`
-        }
-        else {
-            Stop.setAttribute("value", real_min)
-            document.getElementById("sLabel").innerHTML = `Minutes Halted: ${real_min}`
-        }
-
         let MovedTime = Number(Move.getAttribute("value"))
         let StoppedTime =  Number(Stop.getAttribute("value"))
+        if (smoove) {
+            ++MovedTime
+            Move.setAttribute("value", MovedTime)
+            document.getElementById("mLabel").innerHTML = `Minutes Running: ${MovedTime}`
+        }
+        else {
+            ++StoppedTime
+            Stop.setAttribute("value", StoppedTime)
+            document.getElementById("sLabel").innerHTML = `Minutes Halted: ${StoppedTime}`
+        }
+
         let ratio = (1 - (StoppedTime / MovedTime)) * 100
         document.getElementById("ratio").innerHTML = `Uptime ratio: ${ratio}%`
 
         if (real_min === 630) {
+            // Stop both setInterval functions after 10.5 hours
+            clearInterval(clock)
             clearInterval(progress)
         }     
     }, 60000)
 </script>
-</body>
 </html>
