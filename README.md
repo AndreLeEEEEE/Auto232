@@ -205,3 +205,14 @@ the newest version of index.html. Now, the html file reads in the log file every
 the lastest entries. If the entries suggest the line was moving in the past minute, the moving
 progress bar goes up by one. If the entries suggest a halt, the halting progress bar goes up by one.
 The html file hasn't been tested in real-time yet, so there's probably some bugs in it.
+
+Update 7/22/2021: The hardware hasn't been installed yet nor is it finished yet as a bug has come up.
+Rick has told me that he will absolutely finish and hang up the hardware by next Tuesday. He also 
+promised Alex that he'd finish this before his rapidly approaching surgery. That bug with the hardware
+stemmed from the hardware. Without a capacitor or something else, the optical sensor would transmit
+a variety of 1's and 0's when a state change occurs. However, the final transmission does give a
+correct indication of the actual state. With a small capacitor, the flood of random transmissions
+during a state change don't appear anymore. Now, a state change brings on double the output. The
+correct data gets transmitted, but twice. With that something else installed, there aren't extra
+transmissions anymore, but all outputted 0's show up as 1's. I believe Rick is gonna stick with the
+small capacitor and he's gonna fix the bugs through software instead of hardware. 
