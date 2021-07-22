@@ -38,48 +38,101 @@
     <div class="grid">
         <p id="Date"></p>
         <div>
-            <label id="mValue" for="Move">Minutes Running: 0</label>
+            <label id="mLabel" for="Move">Minutes Running: 0</label>
             <progress id="Move" value="0" max="630"></progress>
         </div>
         <div>
-            <label id="sValue" for="Stop">Minutes Halted: 0</label>
+            <label id="sLabel" for="Stop">Minutes Halted: 0</label>
             <progress id="Stop" value="0" max="630"></progress>
         </div>
         <p id="ratio"></p>
     </div>
 <script>
-    fetchFile("Belt.txt")
+    let real_min = 0  // Keep track of the minutes passed since activation
+    let prevLen  // Stores the previous length of the log file
+    let smoove  // Will be a boolean, true is movement, false is stop
+
     async function fetchFile(file) {
+        // Return an array of the data
         let x = await fetch(file)
         let y = await x.text()
-        
+        return y.split("\r\n")
     }
 
-    let real_min = -1
-    let smoove = true
-    let timer = setInterval(function() {  // Function is defined within setInterval so it updates in real time
+    function isHalt(data) {
+        // Return if the data is 3 or 0/1
+        return Number(data) === 3 ? true : false
+    }
+
+    fetchFile("Belt.txt").then(function(result) {
+        // Initialize prevLen once
+        prevLen = result.length
+    })
+
+    let clock = setInterval(function() {
+        // Update the time every second
         let d = new Date()
         document.getElementById("Date").innerHTML = d
-        
+    }, 1000)
+
+    let progress = setInterval(function() {
+        // Update the progress bars every minute
         ++real_min
+        let Move = document.getElementById("Move")  // The move progress bar
+        let Stop = document.getElementById("Stop")  // The stop progress bar
+
+        fetchFile("Belt.txt").then(function(result) {
+            // Change smoove based on activity from the past minute
+            let curLen = result.length
+            if (curLen - prevLen <= 10) {
+                // The line has halted if there are so few new entries
+                smoove = false
+            }
+            else {
+                let recent = curLen - prevLen  // Get the difference in entries
+                let mEntry = skip = 0  // mEntry is amount of moving entries, skip is amount of invalid lines
+                for (let i = 1; i <= recent; ++i) {
+                    // For every most recent entry
+                    switch (result[-i].length) {
+                        case 0:  // Empty line
+                            ++skip
+                            break
+                        case 1:  // Either a session header or starting 3
+                            break
+                        case 2:  // Starting move entry
+                            if (!isHalt(result[-i][0])) {++mEntry}
+                            break
+                        case 4:  // The entry after a starting move entry
+                            if (!isHalt(result[-i][26])) {++mEntry}
+                            break
+                        default:  // Standard entry: timestamp, data, passed secconds
+                            if (!isHalt(result[-i][13])) {++mEntry}
+                    }
+                }
+                recent -= skip  // Readjust the difference
+                // Check if at least 80% of the entries in the pass minute indicated movement
+                smoove = mEntry/recent >= 0.8 ? true : false
+            }
+        })
+        
         if (smoove) {
-            document.getElementById("Move").setAttribute("value", real_min)
-            document.getElementById("mValue").innerHTML = "Minutes Running: " + real_min
+            Move.setAttribute("value", real_min)
+            document.getElementById("mLabel").innerHTML = `Minutes Running: ${real_min}`
         }
         else {
-            document.getElementById("Stop").setAttribute("value", real_min)
-            document.getElementById("sValue").innerHTML = "Minutes Halted: " + real_min
+            Stop.setAttribute("value", real_min)
+            document.getElementById("sLabel").innerHTML = `Minutes Halted: ${real_min}`
         }
 
-        let MovedTime = Number(document.getElementById("Move").getAttribute("value"))
-        let StoppedTime =  Number(document.getElementById("Stop").getAttribute("value"))
+        let MovedTime = Number(Move.getAttribute("value"))
+        let StoppedTime =  Number(Stop.getAttribute("value"))
         let ratio = (1 - (StoppedTime / MovedTime)) * 100
-        document.getElementById("ratio").innerHTML = "Uptime ratio: " + ratio + "%"
+        document.getElementById("ratio").innerHTML = `Uptime ratio: ${ratio}%`
 
         if (real_min === 630) {
-            clearInterval(timer)
+            clearInterval(progress)
         }     
-    }, 1000)
+    }, 60000)
 </script>
 </body>
 </html>
