@@ -49,12 +49,8 @@
     </div>
 </body>
 <script>
-    let real_min = 0  // Keep track of the minutes passed since activation
-    let prevLen  // Stores the previous length of the log file
-    let smoove  // Will be a boolean, true is movement, false is stop
-
     async function fetchFile(file) {
-        // Return an array of the data, each index is a line
+        // Return an array of the data, each element is a line
         let x = await fetch(file)
         let y = await x.text()
         return y.split("\r\n")
@@ -63,28 +59,35 @@
     fetchFile("Belt.txt").then(function(result) {prevLen = result.length})
     // Initialize prevLen once
 
-    function isHalt(data) {return Number(data) === 3 ? true : false}
-    // Return if the data is 3 or 0/1
-
-    let clock = setInterval(function() {document.getElementById("Date").innerHTML = new Date()}, 1000)
+    let clock = setInterval(function() {document.getElementById("Date").innerHTML =
+            new Date()}, 1000)
     // Update the time every second
 
-    let progress = setInterval(function() {
+    let real_min = 0  // Keep track of the minutes passed since activation
+    let prevLen  // Stores the previous length of the log file
+    let isSmoove  // Will be a boolean, true is movement, false is stop
+    let progressBars = setInterval(function() {
         // Update the progress bars every minute
+        function isHalt(data) {return Number(data) === 3 ? true : false}
+        // Return if the data is 3 or 0/1
+        
         ++real_min
-        let Move = document.getElementById("Move")  // The move progress bar
-        let Stop = document.getElementById("Stop")  // The stop progress bar
+        if (real_min === 630) {
+            // Stop both setInterval functions after 10.5 hours
+            clearInterval(clock)
+            clearInterval(progressBars)
+        }
 
         fetchFile("Belt.txt").then(function(result) {
-            // Change smoove based on activity from the past minute
+            // Change isSmoove based on activity from the past minute
             let curLen = result.length
-            if (curLen - prevLen <= 10) {smoove = false}
-            // The line has halted if there are so few new entries
+            if (curLen - prevLen <= 10) {isSmoove = false}
+            // The line has halted if there are few new entries
             else {
-                let recent = curLen - prevLen  // Get the difference in entries
+                let newEntries = curLen - prevLen
                 let mEntry = skip = 0  // mEntry is amount of moving entries, skip is amount of invalid lines
-                for (let i = 1; i <= recent; ++i) {
-                    // For every most recent entry
+                for (let i = 1; i <= newEntries; ++i) {
+                    // For every new entry
                     switch (result[-i].length) {
                         case 0:  // Empty line
                             ++skip
@@ -101,33 +104,28 @@
                             if (!isHalt(result[-i][13])) {++mEntry}
                     }
                 }
-                recent -= skip  // Readjust the difference
-                // Check if at least 80% of the entries in the pass minute indicated movement
-                smoove = mEntry/recent >= 0.80 ? true : false
+                newEntries -= skip  // Readjust the difference
+                isSmoove = mEntry / newEntries >= 0.80 ? true : false
             }
         })
-        
-        let MovedTime = Number(Move.getAttribute("value"))
-        let StoppedTime =  Number(Stop.getAttribute("value"))
-        if (smoove) {
-            ++MovedTime
-            Move.setAttribute("value", MovedTime)
-            document.getElementById("mLabel").innerHTML = `Minutes Running: ${MovedTime}`
+
+        let moveBar = document.getElementById("Move")
+        let stopBar = document.getElementById("Stop")
+        let moveTime = Number(moveBar.getAttribute("value"))
+        let stopTime =  Number(stopBar.getAttribute("value"))
+        if (isSmoove) {
+            ++moveTime
+            moveBar.setAttribute("value", moveTime)
+            document.getElementById("mLabel").innerHTML = `Minutes Running: ${moveTime}`
         }
         else {
-            ++StoppedTime
-            Stop.setAttribute("value", StoppedTime)
-            document.getElementById("sLabel").innerHTML = `Minutes Halted: ${StoppedTime}`
+            ++stopTime
+            stopBar.setAttribute("value", stopTime)
+            document.getElementById("sLabel").innerHTML = `Minutes Halted: ${stopTime}`
         }
 
-        let ratio = (1 - (StoppedTime / MovedTime)) * 100
+        let ratio = (1 - (stopTime / moveTime)) * 100
         document.getElementById("ratio").innerHTML = `Uptime ratio: ${ratio}%`
-
-        if (real_min === 630) {
-            // Stop both setInterval functions after 10.5 hours
-            clearInterval(clock)
-            clearInterval(progress)
-        }     
     }, 60000)
 </script>
 </html>
