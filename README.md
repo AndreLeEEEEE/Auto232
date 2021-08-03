@@ -216,3 +216,6 @@ during a state change don't appear anymore. Now, a state change brings on double
 correct data gets transmitted, but twice. With that something else installed, there aren't extra
 transmissions anymore, but all outputted 0's show up as 1's. I believe Rick is gonna stick with the
 small capacitor and he's gonna fix the bugs through software instead of hardware. 
+
+Update 8/3/2021: The final hardware hasn't been set up yet and Rick is gone for surgery until 
+mid/late August. It'll be a while before progress is made on this project again.
