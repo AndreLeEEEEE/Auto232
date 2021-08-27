@@ -55,20 +55,18 @@
         let y = await x.text();
         return y.split("\r\n");
     }
-
-    fetchFile("Belt.txt").then(function(result) {prevLen = result.length});
     // Initialize prevLen once
-
-    let clock = setInterval(function() {document.getElementById("Date").innerHTML =
-            new Date()}, 1000);
+    fetchFile("Belt.txt").then(function(result) {prevLen = result.length;});
     // Update the time every second
+    let clock = setInterval(function() {document.getElementById("Date").innerHTML =
+            new Date();}, 1000);
 
     let real_min = 0;  // Keep track of the minutes passed since activation
     let prevLen;  // Stores the previous length of the log file
     let isSmoove;  // Will be a boolean, true is movement, false is stop
     let progressBars = setInterval(function() {
         // Update the progress bars every minute
-        function isHalt(data) {return Number(data) === 3 ? true : false};
+        function isHalt(data) {return Number(data) === 3 ? true : false;}
         // Return if the data is 3 or 0/1
         
         ++real_min;
@@ -81,7 +79,7 @@
         fetchFile("Belt.txt").then(function(result) {
             // Change isSmoove based on activity from the past minute
             let curLen = result.length;
-            if (curLen - prevLen <= 10) {isSmoove = false};
+            if (curLen - prevLen <= 10) {isSmoove = false;}
             // The line has halted if there are few new entries
             else {
                 let newEntries = curLen - prevLen;
@@ -95,13 +93,13 @@
                         case 1:  // Either a session header or starting 3
                             break;
                         case 2:  // First move entry
-                            if (!isHalt(result[-i][0])) {++mEntry};
+                            if (!isHalt(result[-i][0])) {++mEntry;}
                             break;
                         case 4:  // The entry after a first move entry
-                            if (!isHalt(result[-i][26])) {++mEntry};
+                            if (!isHalt(result[-i][26])) {++mEntry;}
                             break;
                         default:  // Standard entry: timestamp, data, passed secconds
-                            if (!isHalt(result[-i][13])) {++mEntry};
+                            if (!isHalt(result[-i][13])) {++mEntry;}
                     }
                 }
                 newEntries -= skip;  // Readjust the difference
@@ -126,6 +124,6 @@
 
         let ratio = (1 - (stopTime / moveTime)) * 100;
         document.getElementById("ratio").innerHTML = `Uptime ratio: ${ratio}%`;
-    }, 60000);
+    }, 1000);
 </script>
 </html>
