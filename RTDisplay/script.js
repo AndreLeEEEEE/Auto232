@@ -1,6 +1,8 @@
+// Update the time every second
 let clock = setInterval(function() {document.getElementById("Date").innerHTML =
         new Date();}, 1000);
 
+// Max value of progress bars differ depending on the day
 let date = String(new Date());
 let max = date.includes("Sat") ? "510" : "630";
 document.getElementById("Move").setAttribute("max", max);
@@ -14,7 +16,6 @@ async function fetchFile(file) {
 }
 // Initialize prevLen once
 fetchFile("log.txt").then(function(result) {prevLen = result.length;});
-// Update the time every second
 
 let real_min = 0;  // Keep track of the minutes passed since activation
 let prevLen;  // Stores the previous length of the log file
