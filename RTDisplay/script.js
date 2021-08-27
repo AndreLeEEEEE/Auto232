@@ -1,3 +1,11 @@
+let clock = setInterval(function() {document.getElementById("Date").innerHTML =
+        new Date();}, 1000);
+
+let date = String(new Date());
+let max = date.includes("Sat") ? "510" : "630";
+document.getElementById("Move").setAttribute("max", max);
+document.getElementById("Stop").setAttribute("max", max);
+
 async function fetchFile(file) {
     // Return an array of the data, each element is a line
     let x = await fetch(file);
@@ -5,10 +13,8 @@ async function fetchFile(file) {
     return y.split("\r\n");
 }
 // Initialize prevLen once
-fetchFile("Belt.txt").then(function(result) {prevLen = result.length;});
+fetchFile("IR_test.txt").then(function(result) {prevLen = result.length;});
 // Update the time every second
-let clock = setInterval(function() {document.getElementById("Date").innerHTML =
-        new Date();}, 1000);
 
 let real_min = 0;  // Keep track of the minutes passed since activation
 let prevLen;  // Stores the previous length of the log file
@@ -19,13 +25,13 @@ let progressBars = setInterval(function() {
     // Return if the data is 3 or 0/1
     
     ++real_min;
-    if (real_min === 630) {
-        // Stop both setInterval functions after 10.5 hours
+    if (real_min === Number(max)) {
+        // Stop both setInterval functions at end of work day
         clearInterval(clock);
         clearInterval(progressBars);
     }
 
-    fetchFile("Belt.txt").then(function(result) {
+    fetchFile("IR_test.txt").then(function(result) {
         // Change isSmoove based on activity from the past minute
         let curLen = result.length;
         if (curLen - prevLen <= 10) {isSmoove = false;}
@@ -35,20 +41,21 @@ let progressBars = setInterval(function() {
             let mEntry = skip = 0;  // mEntry is amount of moving entries, skip is amount of invalid lines
             for (let i = 1; i <= newEntries; ++i) {
                 // For every new entry
-                switch (result[-i].length) {
+                let entry = result[-i].split(" ")
+                switch (entry.length) {
                     case 0:  // Empty line
                         ++skip;
                         break;
                     case 1:  // Either a session header or starting 3
                         break;
-                    case 2:  // First move entry
-                        if (!isHalt(result[-i][0])) {++mEntry;}
+                    case 2:  // A first move entry or standard 3
+                        if (!entry[0].includes(":")) {++mEntry;}
                         break;
                     case 4:  // The entry after a first move entry
-                        if (!isHalt(result[-i][26])) {++mEntry;}
+                        if (!isHalt(entry[2])) {++mEntry;}
                         break;
                     default:  // Standard entry: timestamp, data, passed secconds
-                        if (!isHalt(result[-i][13])) {++mEntry;}
+                        if (!isHalt(entry[1])) {++mEntry;}
                 }
             }
             newEntries -= skip;  // Readjust the difference
