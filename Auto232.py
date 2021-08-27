@@ -2,13 +2,13 @@ import openpyxl  # Needed for Excel
 import re  # Needed for special splits and sub
 import time  # Needed for dates
 from datetime import timedelta  # Needed for time calculations
-# Approved
+
 def readFile(logs):
     """Extract the log data and make it usable."""
     """
     logs - list of list of str, empty, will contain all session information
     """
-    with open("BeltMovement", "r") as file:
+    with open("IR_test.txt", "r") as file:
         # Use 'with open' for automatic file closing
         Lines = file.readlines()
         temp = ""  # Meant for the first fragmented entry
@@ -31,7 +31,7 @@ def readFile(logs):
 
     for log in logs:  # Check each session
         checkValidity(log)
-# Approved
+
 def checkValidity(log):
     """Make sure there's nothing syntactically wrong with the data."""
     """
@@ -49,8 +49,8 @@ def checkValidity(log):
     for line in log[1:]:  # Starting after the session info stamp
         entry = line.split()  # Separate time stamp, data, and time
         if not state:  # Set state depending on first data entry
-            if entry[1] == "1": state = "Low"
-            elif entry[1] == "0": state = "High"
+            if entry[1] == "0": state = "Low"
+            elif entry[1] == "1": state = "High"
         # Check time stamps
         if line == log[1]:  # Set pTime on first entry
                 pTime = entry[0]
@@ -62,11 +62,11 @@ def checkValidity(log):
                 # Update pTime when check passed
         # Check data
         if not state: continue  # Waiting for a state
-        if (entry[1] == "1") and (state == "Low"): state = "High"
+        if (entry[1] == "0") and (state == "Low"): state = "High"
             # Confirm a 1, now expecting a 0 next
-        elif (entry[1] == "0") and (state == "High"): state = "Low"
+        elif (entry[1] == "1") and (state == "High"): state = "Low"
             # Confirm a 0, now expecting a 1 next
-        elif entry[1] == "3": continue  # To prevent indexing error
+        elif entry[1] == "3": continue
         else:  # Occurs if the transmitted data is unrecognized
             raise Exception("Unrecognized data in session: {}".format(log[0]))
         # Check time
@@ -75,18 +75,17 @@ def checkValidity(log):
             or not entry[2][0:2].isdigit()
             or not entry[2][3:].isdigit()):
             raise Exception("Incorrect time mode format in session: {}".format(log[0]))
-# Approved
+
 def analyzeData(log):
     """Return when/for how long the belt moved and stopped."""
     """
     log - list of str, contains session info and entries
     """
-    # Approved
     def moveDetector(diff, period, moveBlocks, start, pTime):
-        """Check if the belt is moving or stopped."""
+        """Return the starting time for a move or stop interval."""
         """
-        diff - float, amount of time passed since last data
-        period - diff, amount seconds to compare diff to 
+        diff - str, amount of time passed since last data
+        period - float, amount seconds to compare diff to 
         moveBlocks - list of list of str, stores intervals of movement
         start - str, time when the belt started moving
         pTime - str, previous time
@@ -111,14 +110,12 @@ def analyzeData(log):
             # On the first entry, set prevTime
         else:  # Update end
             end = entry[0][0:-1]
-            if entry[1] == "1":  # Reached end of chain/start of gap
+            if entry[1] == "0":  # Reached end of chain/start of gap
                 begin = moveDetector(entry[2], 5.3125, SmooveBlocks, begin, prevTime)
-            elif entry[1] == "0":  # Reached end of gap/start of chain
+            elif entry[1] == "1":  # Reached end of gap/start of chain
                 begin = moveDetector(entry[2], 4.25, SmooveBlocks, begin, prevTime)
-            elif entry[1] == "3":  # Instant stoppage
+            else:  # Instant stoppage on 3
                 begin = moveDetector(1, 0, SmooveBlocks, begin, prevTime)
-            else: pass
-                # Stoppage
             prevTime = end  # Update prevTime
 
         if line == log[-1] and len(SmooveBlocks[-1]) == 1:
@@ -126,7 +123,7 @@ def analyzeData(log):
             SmooveBlocks[-1].append(end)
 
     return SmooveBlocks
-# Approved
+
 def toExcel(logs, xlData):
     """Make Excel workbook with data."""
     """
@@ -166,12 +163,16 @@ def toExcel(logs, xlData):
         total_hr += total_min // 60  # Take any hours from minutes
         total_min = total_min % 60  # Adjust minutes
         return [total_hr, total_min, total_s]
-    def stopTime(dailyMove):
+    def stopTime(dailyMove, Saturday):
         """Return the daily total of stop time."""
         """
         dailyMove - list of float, the daily total of move time
+        Saturday - boolean, indicates that it's Saturday
         """
-        whole_day = timedelta(hours=10, minutes=30, seconds=0)  # 6:00 am to 4:30 pm
+        if Saturday:  # 6:00 am to 2:30 pm
+            whole_day = timedelta(hours=8, minutes=30, seconds=0)
+        else:  # 6:00 am to 4:30 pm
+            whole_day = timedelta(hours=10, minutes=30, seconds=0)
         DM = timedelta(hours=dailyMove[0], minutes=dailyMove[1], seconds=dailyMove[2])
         c = whole_day - DM
         min = c.total_seconds() // 60  # Total minutes without remainder
@@ -203,11 +204,13 @@ def toExcel(logs, xlData):
                 temp_str = ("Hours: {}, Minutes: {}, Seconds: {}"
                             .format(inter[0], inter[1], inter[2]))
                 ws.cell(row=row_num+i, column=4).value = temp_str
-            # Do the below for each session
-            mTol = tolTime(times)  # Daily total movement time
+            # Daily total movement time
+            mTol = tolTime(times)
             temp_str = "Daily move time: {}:{}:{}".format(mTol[0], mTol[1], mTol[2])
             ws.cell(row=row_num+count, column=4).value = temp_str
-            sTol = stopTime(mTol)  # Daily total stop time
+            # Daily total stop time
+            Saturday = True if stamp.__contains__("Sat") else False
+            sTol = stopTime(mTol, Saturday)
             temp_str = "Daily stop time: {}:{}:{}".format(sTol[0], sTol[1], sTol[2])
             ws.cell(row=row_num+count+1, column=4).value = temp_str
             row_num += count + 2  # Update row_num to pass all recently filled rows
@@ -217,7 +220,7 @@ def toExcel(logs, xlData):
     date = re.sub("/", "_", date)  # Replace / with _ for valid name
     name = "AutoLine_Weekly_Report_" + date + ".xlsx"
     wb.save(name)  # Save changes
-# Approved
+
 def main():
     logs = []
     xlData = []
@@ -227,4 +230,3 @@ def main():
     toExcel(logs, xlData)
 
 main()
-# Assume the workday is from 6:00 am to 4:30pm
