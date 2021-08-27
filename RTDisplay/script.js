@@ -13,7 +13,7 @@ async function fetchFile(file) {
     return y.split("\r\n");
 }
 // Initialize prevLen once
-fetchFile("IR_test.txt").then(function(result) {prevLen = result.length;});
+fetchFile("log.txt").then(function(result) {prevLen = result.length;});
 // Update the time every second
 
 let real_min = 0;  // Keep track of the minutes passed since activation
@@ -31,7 +31,7 @@ let progressBars = setInterval(function() {
         clearInterval(progressBars);
     }
 
-    fetchFile("IR_test.txt").then(function(result) {
+    fetchFile("log.txt").then(function(result) {
         // Change isSmoove based on activity from the past minute
         let curLen = result.length;
         if (curLen - prevLen <= 10) {isSmoove = false;}
