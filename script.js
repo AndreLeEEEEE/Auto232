@@ -41,20 +41,21 @@ let progressBars = setInterval(function() {
             let mEntry = skip = 0;  // mEntry is amount of moving entries, skip is amount of invalid lines
             for (let i = 1; i <= newEntries; ++i) {
                 // For every new entry
-                switch (result[-i].length) {
+                let entry = result[-i].split(" ")
+                switch (entry.length) {
                     case 0:  // Empty line
                         ++skip;
                         break;
                     case 1:  // Either a session header or starting 3
                         break;
-                    case 2:  // First move entry
-                        if (!isHalt(result[-i][0])) {++mEntry;}
+                    case 2:  // A first move entry or standard 3
+                        if (!entry[0].includes(":")) {++mEntry;}
                         break;
                     case 4:  // The entry after a first move entry
-                        if (!isHalt(result[-i][26])) {++mEntry;}
+                        if (!isHalt(entry[2])) {++mEntry;}
                         break;
                     default:  // Standard entry: timestamp, data, passed secconds
-                        if (!isHalt(result[-i][13])) {++mEntry;}
+                        if (!isHalt(entry[1])) {++mEntry;}
                 }
             }
             newEntries -= skip;  // Readjust the difference
