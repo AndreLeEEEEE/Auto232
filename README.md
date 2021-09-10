@@ -8,7 +8,7 @@ The type of data we're looking for is:
 Versions of software and digital tools:
 - python 3.7.8
 - Visual Studio 16.11.2
-- openpyxl 3.0.7
+- openpyxl 3.0.7 (new version available)
 - Termite 3.4 (w/Time stamp and Log plug-in)
 
 Requirements:
