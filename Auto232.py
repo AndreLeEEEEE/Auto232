@@ -8,18 +8,19 @@ def readFile(logs):
     """
     logs - list of list of str, empty, will contain all session information
     """
-    with open("IR_test.txt", "r") as file:
+    with open("Dec13-18,2021.txt", "r") as file:
         # Use 'with open' for automatic file closing
         Lines = file.readlines()
         temp = ""  # Meant for the first fragmented entry
         for line in Lines:
             # Any [0:-1] in this function is for removing the newline chr
+            # logs[-1] refers to the most recently appended session
             if (line == "\n") or (line.__contains__("*")): pass
                 # Skip empty lines and * placeholder lines
             elif line.__contains__("Termite log"): logs.append([line[0:-1]])
                 # Add a new session when the log marks a new session
             elif ':' not in line: temp = line[0:-1]
-                # Store the fragmented entry for later
+                # Store the fragmented entry (first entry) for later
             elif temp:
                 # Gather the fragments and record the complete entry
                 logs[-1].append(line.split(" ", 1)[0] + " " + temp)
@@ -48,32 +49,53 @@ def checkValidity(log):
 
     for line in log[1:]:  # Starting after the session info stamp
         entry = line.split()  # Separate time stamp, data, and time
+        if len(entry[0]) == 9:
+            timestamp = entry[0]
+            data = entry[1]
+            # A different value is assigned if data is 3
+            timePass = entry[2] if len(entry) == 3 else ""
+        else:
+            # For when an entry occurs too fast and 
+            # shares the same timestamp as the previous entry
+            timestamp = ""
+            data = entry[0]
+            timePass = entry[1]
+
         if not state:  # Set state depending on first data entry
-            if entry[1] == "0": state = "Low"
-            elif entry[1] == "1": state = "High"
+            if data == "0": state = "Low"
+            elif data == "1": state = "High"
+
         # Check time stamps
-        if line == log[1]:  # Set pTime on first entry
-                pTime = entry[0]
-        else:  # Update cTime
-            cTime = entry[0]
-            if pTime > cTime:  # If pTime is later than cTime
-                raise Exception("Time error in session: {}".format(log[0]))
-            else: pTime = cTime
-                # Update pTime when check passed
+        if timestamp:
+            if line == log[1]:  # Set pTime on first entry
+                pTime = timestamp
+            else:  # Update cTime
+                cTime = timestamp
+                if pTime > cTime:  # If pTime is later than cTime
+                    raise Exception("Time error in session: {}".format(log[0]))
+                else: pTime = cTime
+                    # Update pTime when check passed
+
         # Check data
-        if not state: continue  # Waiting for a state
-        if (entry[1] == "0") and (state == "Low"): state = "High"
-            # Confirm a 1, now expecting a 0 next
-        elif (entry[1] == "1") and (state == "High"): state = "Low"
-            # Confirm a 0, now expecting a 1 next
-        elif entry[1] == "3": continue
-        else:  # Occurs if the transmitted data is unrecognized
-            raise Exception("Unrecognized data in session: {}".format(log[0]))
-        # Check time
-        if (len(entry[2]) != 6  # 6 doesn't include newline
-            or entry[2][2] != '.'
-            or not entry[2][0:2].isdigit()
-            or not entry[2][3:].isdigit()):
+        if state:
+            if (data == "0") and (state == "Low"): state = "High"
+                # Confirm a 1, now expecting a 0 next
+            elif (data == "1") and (state == "High"): state = "Low"
+                # Confirm a 0, now expecting a 1 next
+            elif data == "3": continue
+            else:  # Occurs if the transmitted data is unrecognized
+                print(entry)
+                print(state)
+                raise Exception("Unrecognized data in session: {}".format(log[0]))
+        else:
+            # Waiting for a state
+            continue
+
+        # Check time passed
+        if (len(timePass) != 6  # 6 doesn't include newline
+            or timePass[2] != '.'
+            or not timePass[0:2].isdigit()
+            or not timePass[3:].isdigit()):
             raise Exception("Incorrect time mode format in session: {}".format(log[0]))
 
 def analyzeData(log):
