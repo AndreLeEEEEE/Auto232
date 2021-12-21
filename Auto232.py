@@ -19,7 +19,7 @@ def readFile(logs):
                 # Skip empty lines and * placeholder lines
             elif line.__contains__("Termite log"): logs.append([line[0:-1]])
                 # Add a new session when the log marks a new session
-            elif ':' not in line: temp = line[0:-1]
+            elif (':' not in line) and (len(line[0:-1]) == 1): temp = line[0:-1]
                 # Store the fragmented entry (first entry) for later
             elif temp:
                 # Gather the fragments and record the complete entry
@@ -32,6 +32,29 @@ def readFile(logs):
 
     for log in logs:  # Check each session
         checkValidity(log)
+
+def sepEntry(line):
+    """Separate an entry into its timestamp, data, and time passed."""
+    """
+    line - string, one line from the log file
+    """
+
+    entry = line.split()
+    # If timestamp exists
+    if len(entry[0]) == 9:
+        timestamp = entry[0]
+        data = entry[1]
+        # This entry could be an idle entry or a moving one
+        # If 3 is the data, time passed doesn't exist
+        timePass = entry[2] if len(entry) == 3 else ""
+    else:
+        # For when an entry occurs too fast and 
+        # shares the same timestamp as the previous entry
+        timestamp = ""
+        data = entry[0]
+        timePass = entry[1]
+
+    return timestamp, data, timePass
 
 def checkValidity(log):
     """Make sure there's nothing syntactically wrong with the data."""
@@ -48,18 +71,7 @@ def checkValidity(log):
     if len(log) == 1: return  # A stamp but no entries
 
     for line in log[1:]:  # Starting after the session info stamp
-        entry = line.split()  # Separate time stamp, data, and time
-        if len(entry[0]) == 9:
-            timestamp = entry[0]
-            data = entry[1]
-            # A different value is assigned if data is 3
-            timePass = entry[2] if len(entry) == 3 else ""
-        else:
-            # For when an entry occurs too fast and 
-            # shares the same timestamp as the previous entry
-            timestamp = ""
-            data = entry[0]
-            timePass = entry[1]
+        timestamp, data, timePass = sepEntry(line)
 
         if not state:  # Set state depending on first data entry
             if data == "0": state = "Low"
@@ -84,8 +96,6 @@ def checkValidity(log):
                 # Confirm a 0, now expecting a 1 next
             elif data == "3": continue
             else:  # Occurs if the transmitted data is unrecognized
-                print(entry)
-                print(state)
                 raise Exception("Unrecognized data in session: {}".format(log[0]))
         else:
             # Waiting for a state
@@ -99,7 +109,7 @@ def checkValidity(log):
             raise Exception("Incorrect time mode format in session: {}".format(log[0]))
 
 def analyzeData(log):
-    """Return when/for how long the belt moved and stopped."""
+    """Return when/for how long the belt moved and stopped for one day."""
     """
     log - list of str, contains session info and entries
     """
@@ -127,22 +137,28 @@ def analyzeData(log):
     prevTime = ""  # Holds previous time
     SmooveBlocks = []
     for line in log[1:]:  # Go through each entry
-        entry = line.split()  # Separate time and data
-        if line == log[1]: prevTime = entry[0][0:-1]  # Exclude ending ':'
+        timestamp, data, timePass = sepEntry(line)
+
+        if line == log[1]: prevTime = timestamp[0:-1]  # Exclude ending ':'
             # On the first entry, set prevTime
         else:  # Update end
-            end = entry[0][0:-1]
-            if entry[1] == "0":  # Reached end of chain/start of gap
-                begin = moveDetector(entry[2], 5.3125, SmooveBlocks, begin, prevTime)
-            elif entry[1] == "1":  # Reached end of gap/start of chain
-                begin = moveDetector(entry[2], 4.25, SmooveBlocks, begin, prevTime)
-            else:  # Instant stoppage on 3
-                begin = moveDetector(1, 0, SmooveBlocks, begin, prevTime)
-            prevTime = end  # Update prevTime
+            if timestamp:
+                end = timestamp[0:-1]
+                if data == "0":  # Reached end of chain/start of gap
+                    begin = moveDetector(timePass, 5.3125, SmooveBlocks, begin, prevTime)
+                elif data == "1":  # Reached end of gap/start of chain
+                    begin = moveDetector(timePass, 4.25, SmooveBlocks, begin, prevTime)
+                else:  # Instant stoppage on 3
+                    begin = moveDetector(1, 0, SmooveBlocks, begin, prevTime)
+                prevTime = end  # Update prevTime
 
-        if line == log[-1] and len(SmooveBlocks[-1]) == 1:
-            # On last entry and half interval
-            SmooveBlocks[-1].append(end)
+        if line == log[-1]:
+            if not SmooveBlocks:
+                # If there's been no movement the entire day
+                SmooveBlocks.append([])
+            elif len(SmooveBlocks[-1]) == 1:
+                # On last entry and half interval
+                SmooveBlocks[-1].append(end)
 
     return SmooveBlocks
 
@@ -215,7 +231,7 @@ def toExcel(logs, xlData):
         row_num += 1  # Get ready to write in data
         times = []  # Needed for daily total
         data = xlData[x]  # Data for only one session
-        if data:  # If there's something
+        if data[0]:  # If there's something
             count = len(data)  # Amount of intervals
             for i in range(count):  # For each interval
                 B = data[i][0]  # Beginning of interval
