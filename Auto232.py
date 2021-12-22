@@ -11,7 +11,6 @@ def readFile():
     lastDate = ""
     with open("Dec13-18,2021.txt", "r") as file:
         # AUTOLINE_LOG_FILE.txt
-        # Use 'with open' for automatic file closing
         Lines = file.readlines()
         temp = ""  # Meant for the first fragmented entry
         for line in Lines:
@@ -39,6 +38,14 @@ def readFile():
 
     ltDt = lastDate.split()
     lastDate = ltDt[5] + "_" + ltDt[6] + "_" + ltDt[8]
+
+    with open("LogFile_" + lastDate + ".txt", "w") as file:
+        # Archive the raw log file
+        file.writelines(Lines)
+
+    with open("Dec13-18,2021.txt", "w") as file:
+        # Clear the original log file
+        pass
 
     return logs, lastDate
 
