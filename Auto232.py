@@ -3,12 +3,14 @@ import re  # Needed for special splits and sub
 import time  # Needed for dates
 from datetime import timedelta  # Needed for time calculations
 
-def readFile(logs):
+def readFile():
     """Extract the log data and make it usable."""
-    """
-    logs - list of list of str, empty, will contain all session information
-    """
+
+    logs = []
+    # Keep the day that appears last in the file
+    lastDate = ""
     with open("Dec13-18,2021.txt", "r") as file:
+        # AUTOLINE_LOG_FILE.txt
         # Use 'with open' for automatic file closing
         Lines = file.readlines()
         temp = ""  # Meant for the first fragmented entry
@@ -17,8 +19,10 @@ def readFile(logs):
             # logs[-1] refers to the most recently appended session
             if (line == "\n") or (line.__contains__("*")): pass
                 # Skip empty lines and * placeholder lines
-            elif line.__contains__("Termite log"): logs.append([line[0:-1]])
+            elif line.__contains__("Termite log"):
                 # Add a new session when the log marks a new session
+                logs.append([line[0:-1]])
+                lastDate = line
             elif (':' not in line) and (len(line[0:-1]) == 1): temp = line[0:-1]
                 # Store the fragmented entry (first entry) for later
             elif temp:
@@ -32,6 +36,11 @@ def readFile(logs):
 
     for log in logs:  # Check each session
         checkValidity(log)
+
+    ltDt = lastDate.split()
+    lastDate = ltDt[5] + "_" + ltDt[6] + "_" + ltDt[8]
+
+    return logs, lastDate
 
 def sepEntry(line):
     """Separate an entry into its timestamp, data, and time passed."""
@@ -109,7 +118,7 @@ def checkValidity(log):
             raise Exception("Incorrect time mode format in session: {}".format(log[0]))
 
 def analyzeData(log):
-    """Return when/for how long the belt moved and stopped for one day."""
+    """Return when/for how long the belt moved for one day."""
     """
     log - list of str, contains session info and entries
     """
@@ -153,20 +162,22 @@ def analyzeData(log):
                 prevTime = end  # Update prevTime
 
         if line == log[-1]:
+            # On the last line
             if not SmooveBlocks:
                 # If there's been no movement the entire day
                 SmooveBlocks.append([])
             elif len(SmooveBlocks[-1]) == 1:
-                # On last entry and half interval
+                # If the last interval is only partially complete
                 SmooveBlocks[-1].append(end)
 
     return SmooveBlocks
 
-def toExcel(logs, xlData):
+def toExcel(logs, xlData, lastDate):
     """Make Excel workbook with data."""
     """
     logs - list of list of str, contains all session information
     xlData - list of list of str, moving intervals for every session
+    lastDate - str, the last day recorded in a log file
     """
     def timeDiff(aTime, bTime):
         """Return the difference in times."""
@@ -230,7 +241,7 @@ def toExcel(logs, xlData):
         ws.cell(row=row_num, column=1).value = stamp
         row_num += 1  # Get ready to write in data
         times = []  # Needed for daily total
-        data = xlData[x]  # Data for only one session
+        data = xlData[x]  # Data for only one session/day
         if data[0]:  # If there's something
             count = len(data)  # Amount of intervals
             for i in range(count):  # For each interval
@@ -247,6 +258,7 @@ def toExcel(logs, xlData):
             temp_str = "Daily move time: {}:{}:{}".format(mTol[0], mTol[1], mTol[2])
             ws.cell(row=row_num+count, column=4).value = temp_str
             # Daily total stop time
+            # Total time in work day depends on day
             Saturday = True if stamp.__contains__("Sat") else False
             sTol = stopTime(mTol, Saturday)
             temp_str = "Daily stop time: {}:{}:{}".format(sTol[0], sTol[1], sTol[2])
@@ -254,17 +266,16 @@ def toExcel(logs, xlData):
             row_num += count + 2  # Update row_num to pass all recently filled rows
         else: row_num += 1
     
-    date = time.strftime("%D", time.localtime())  # Get MM/DD/YYYY
-    date = re.sub("/", "_", date)  # Replace / with _ for valid name
-    name = "AutoLine_Weekly_Report_" + date + ".xlsx"
+    #date = time.strftime("%D", time.localtime())  # Get MM/DD/YYYY
+    #date = re.sub("/", "_", date)  # Replace / with _ for valid name
+    name = "AutoLine_Weekly_Report_" + lastDate + ".xlsx"
     wb.save(name)  # Save changes
 
 def main():
-    logs = []
     xlData = []
-    readFile(logs)
+    logs, lastDate = readFile()
     for log in logs:  # Cycle through each session
         xlData.append(analyzeData(log))
-    toExcel(logs, xlData)
+    toExcel(logs, xlData, lastDate)
 
 main()
