@@ -9,8 +9,7 @@ def readFile():
     logs = []
     # Keep the day that appears last in the file
     lastDate = ""
-    with open("Dec13-18,2021.txt", "r") as file:
-        # AUTOLINE_LOG_FILE.txt
+    with open("AUTOLINE LOG FILE.txt", "r") as file:
         Lines = file.readlines()
         temp = ""  # Meant for the first fragmented entry
         for line in Lines:
@@ -39,11 +38,11 @@ def readFile():
     ltDt = lastDate.split()
     lastDate = ltDt[5] + "_" + ltDt[6] + "_" + ltDt[8]
 
-    with open("LogFile_" + lastDate + ".txt", "w") as file:
+    with open("Log Archive\LogFile_" + lastDate + ".txt", "w") as file:
         # Archive the raw log file
         file.writelines(Lines)
 
-    with open("Dec13-18,2021.txt", "w") as file:
+    with open("AUTOLINE LOG FILE.txt", "w") as file:
         # Clear the original log file
         pass
 
@@ -160,8 +159,8 @@ def analyzeData(log):
         else:  # Update end
             if timestamp:
                 end = timestamp[0:-1]
-                if data == "0":  # Reached end of chain/start of gap
-                    begin = moveDetector(timePass, 5.3125, SmooveBlocks, begin, prevTime)
+                if data == "0":  # Reached end of chain/start of gap, # old value: 5.3125
+                    begin = moveDetector(timePass, 6.3, SmooveBlocks, begin, prevTime)
                 elif data == "1":  # Reached end of gap/start of chain
                     begin = moveDetector(timePass, 4.25, SmooveBlocks, begin, prevTime)
                 else:  # Instant stoppage on 3
@@ -275,7 +274,7 @@ def toExcel(logs, xlData, lastDate):
     
     #date = time.strftime("%D", time.localtime())  # Get MM/DD/YYYY
     #date = re.sub("/", "_", date)  # Replace / with _ for valid name
-    name = "AutoLine_Weekly_Report_" + lastDate + ".xlsx"
+    name = "Reports\AutoLine_Weekly_Report_" + lastDate + ".xlsx"
     wb.save(name)  # Save changes
 
 def main():
