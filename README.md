@@ -21,8 +21,11 @@ optical sensor.
 The receiver acquires these signals and sends them to a RS-232 port.
 
 The transmitter, at the moment, sends three signals: 0, 1, and 3.
+
 1 - Transition from low to high, metal blocks the IR beam
+
 0 - Transition from high to low, nothing blocks the IR beam
+
 3 - Stalling
 
 This means that, when working as intended, the hardware will alternate between transmitting 1's and 0's;
