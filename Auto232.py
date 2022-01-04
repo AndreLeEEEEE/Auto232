@@ -9,7 +9,8 @@ def readFile():
     logs = []
     # Keep the day that appears last in the file
     lastDate = ""
-    with open("AUTOLINE LOG FILE.txt", "r") as file:
+    #with open("AUTOLINE LOG FILE.txt", "r") as file:
+    with open("LogFile_Dec_30_2021.txt", "r") as file:
         Lines = file.readlines()
         temp = ""  # Meant for the first fragmented entry
         for line in Lines:
@@ -38,11 +39,13 @@ def readFile():
     ltDt = lastDate.split()
     lastDate = ltDt[5] + "_" + ltDt[6] + "_" + ltDt[8]
 
+    #with open("Log Archive\LogFile_" + lastDate + ".txt", "w") as file:
     with open("Log Archive\LogFile_" + lastDate + ".txt", "w") as file:
         # Archive the raw log file
         file.writelines(Lines)
 
-    with open("AUTOLINE LOG FILE.txt", "w") as file:
+    #with open("AUTOLINE LOG FILE.txt", "w") as file:
+    with open("LogFile_Dec_30_2021.txt", "w") as file:
         # Clear the original log file
         pass
 
@@ -86,7 +89,11 @@ def checkValidity(log):
     if len(log) == 1: return  # A stamp but no entries
 
     for line in log[1:]:  # Starting after the session info stamp
-        timestamp, data, timePass = sepEntry(line)
+        # In the event a session has one non-movement entry
+        if not line:
+            continue
+        else:
+            timestamp, data, timePass = sepEntry(line)
 
         if not state:  # Set state depending on first data entry
             if data == "0": state = "Low"
@@ -114,6 +121,7 @@ def checkValidity(log):
                 raise Exception("Unrecognized data in session: {}".format(log[0]))
         else:
             # Waiting for a state
+            # Ensures Check time passed doesn't execute if the first entry is 3
             continue
 
         # Check time passed
@@ -152,7 +160,10 @@ def analyzeData(log):
     prevTime = ""  # Holds previous time
     SmooveBlocks = []
     for line in log[1:]:  # Go through each entry
-        timestamp, data, timePass = sepEntry(line)
+        if not line:
+            continue
+        else:
+            timestamp, data, timePass = sepEntry(line)
 
         if line == log[1]: prevTime = timestamp[0:-1]  # Exclude ending ':'
             # On the first entry, set prevTime
@@ -248,28 +259,29 @@ def toExcel(logs, xlData, lastDate):
         row_num += 1  # Get ready to write in data
         times = []  # Needed for daily total
         data = xlData[x]  # Data for only one session/day
-        if data[0]:  # If there's something
-            count = len(data)  # Amount of intervals
-            for i in range(count):  # For each interval
-                B = data[i][0]  # Beginning of interval
-                E = data[i][1]  # Ending of interval
-                ws.cell(row=row_num+i, column=1).value = B + "-" + E
-                inter = timeDiff(B, E)  # Get duration
-                times.append(inter)
-                temp_str = ("Hours: {}, Minutes: {}, Seconds: {}"
-                            .format(inter[0], inter[1], inter[2]))
-                ws.cell(row=row_num+i, column=4).value = temp_str
-            # Daily total movement time
-            mTol = tolTime(times)
-            temp_str = "Daily move time: {}:{}:{}".format(mTol[0], mTol[1], mTol[2])
-            ws.cell(row=row_num+count, column=4).value = temp_str
-            # Daily total stop time
-            # Total time in work day depends on day
-            Saturday = True if stamp.__contains__("Sat") else False
-            sTol = stopTime(mTol, Saturday)
-            temp_str = "Daily stop time: {}:{}:{}".format(sTol[0], sTol[1], sTol[2])
-            ws.cell(row=row_num+count+1, column=4).value = temp_str
-            row_num += count + 2  # Update row_num to pass all recently filled rows
+        if data:  # If there's something
+            if data[0]:
+                count = len(data)  # Amount of intervals
+                for i in range(count):  # For each interval
+                    B = data[i][0]  # Beginning of interval
+                    E = data[i][1]  # Ending of interval
+                    ws.cell(row=row_num+i, column=1).value = B + "-" + E
+                    inter = timeDiff(B, E)  # Get duration
+                    times.append(inter)
+                    temp_str = ("Hours: {}, Minutes: {}, Seconds: {}"
+                                .format(inter[0], inter[1], inter[2]))
+                    ws.cell(row=row_num+i, column=4).value = temp_str
+                # Daily total movement time
+                mTol = tolTime(times)
+                temp_str = "Daily move time: {}:{}:{}".format(mTol[0], mTol[1], mTol[2])
+                ws.cell(row=row_num+count, column=4).value = temp_str
+                # Daily total stop time
+                # Total time in work day depends on day
+                Saturday = True if stamp.__contains__("Sat") else False
+                sTol = stopTime(mTol, Saturday)
+                temp_str = "Daily stop time: {}:{}:{}".format(sTol[0], sTol[1], sTol[2])
+                ws.cell(row=row_num+count+1, column=4).value = temp_str
+                row_num += count + 2  # Update row_num to pass all recently filled rows
         else: row_num += 1
     
     #date = time.strftime("%D", time.localtime())  # Get MM/DD/YYYY
