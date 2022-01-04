@@ -28,5 +28,5 @@ This date is the most recent day recorded in the log file at time of processing.
 much the paint line moved on a certain day, they need to look for the archived log file or report with the nearest 
 date after the target day.
 
-It's recommended that the user creates a shortcut of the executable and places that shortcut in a more convenient
+It's recommended that the user copies the shortcut of the executable and moves that copy to a more convenient
 location on the computer. 
