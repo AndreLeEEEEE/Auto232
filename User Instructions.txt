@@ -1,0 +1,32 @@
+User Instructions for Auto Line Monitor Software
+
+The executable for this project is called 'GenerateAutoReport.exe'.
+
+It's located within the shared network drive, 'PCMRP (P:)', in the folder labelled 'ricksr'.
+
+Running GenerateAutoReport.exe requires no input from the user. However, the user should understand 
+what occurs when the executable is ran. 
+
+First, the program searches for and reads in the file, 'AUTOLINE LOG FILE.txt', from the folder, 'LogFiles'.
+Second, any data in the log file will be saved to a separate text file in the folder, 'Log Archive'.
+Third, the log file will be cleared of all data.
+Fourth, an excel sheet containing the analyzed data will be generated in the folder, 'Reports'.
+
+There are a few things to note about this process.
+
+The program can be run on varying lengths of time. A report can be generated from a log file containing 
+a week's worth of data, a few days, a month, and etc. This means the user can run the executable on any day.
+However, this should only occur at the end of the paint line's workday as to avoid the processing of incomplete data.
+The latest the paint line can end on weekdays is 4:30 pm, while on Satuday it's 2:30 pm.
+
+Once the user clicks on the executable, be warned that the log file will be cleared of all data. Should the user
+want to view the raw data, they need to look for the corresponding file in 'Log Archive'.
+
+Since the user can run the executable on any day, combined with the fact that Sundays, Saturdays, and holidays exist, 
+the naming scheme for archived log files and reports is broad. Appended to the end of either type of file is a date. 
+This date is the most recent day recorded in the log file at time of processing. So if the user needs to know how 
+much the paint line moved on a certain day, they need to look for the archived log file or report with the nearest 
+date after the target day.
+
+It's recommended that the user creates a shortcut of the executable and places that shortcut in a more convenient
+location on the computer. 

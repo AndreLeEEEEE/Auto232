@@ -9,8 +9,7 @@ def readFile():
     logs = []
     # Keep the day that appears last in the file
     lastDate = ""
-    #with open("AUTOLINE LOG FILE.txt", "r") as file:
-    with open("LogFile_Dec_30_2021.txt", "r") as file:
+    with open("LogFiles\AUTOLINE LOG FILE.txt", "r") as file:
         Lines = file.readlines()
         temp = ""  # Meant for the first fragmented entry
         for line in Lines:
@@ -39,13 +38,11 @@ def readFile():
     ltDt = lastDate.split()
     lastDate = ltDt[5] + "_" + ltDt[6] + "_" + ltDt[8]
 
-    #with open("Log Archive\LogFile_" + lastDate + ".txt", "w") as file:
     with open("Log Archive\LogFile_" + lastDate + ".txt", "w") as file:
         # Archive the raw log file
         file.writelines(Lines)
 
-    #with open("AUTOLINE LOG FILE.txt", "w") as file:
-    with open("LogFile_Dec_30_2021.txt", "w") as file:
+    with open("LogFiles\AUTOLINE LOG FILE.txt", "w") as file:
         # Clear the original log file
         pass
 
