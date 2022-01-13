@@ -16,8 +16,13 @@ There are a few things to note about this process.
 
 The program can be run on varying lengths of time. A report can be generated from a log file containing 
 a week's worth of data, a few days, a month, and etc. This means the user can run the executable on any day.
-However, this should only occur at the end of the paint line's workday as to avoid the processing of incomplete data.
-The latest the paint line can end on weekdays is 4:30 pm, while on Satuday it's 2:30 pm.
+However, this should only occur while the log file isn't being written to, such as at the end of the paint
+line's workday. There are two reasons for this. The first reason is that it's not logical to run data analysis
+on data that's incomplete or currently in the making. The second reason is that it's not possible to manually 
+modify the log file since it's being used by another program, Termite. This is why the user must wait for Termite
+to be off before running the executable. 
+
+Termite is set to run on weekdays from 6 am to 4:30 pm and on Saturday from 6 am to 2:30 pm.
 
 Once the user clicks on the executable, be warned that the log file will be cleared of all data. Should the user
 want to view the raw data, they need to look for the corresponding file in 'Log Archive'.
