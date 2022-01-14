@@ -40,3 +40,5 @@ don't have to close Termite in order to save the data to the log, it'll do so as
 be in a network drive so any computer can access the log if they can access the drive. From there, I 
 would run the program on that file at the end of the week to produce an excel sheet. This weekly report
 would be put into the network drive. 
+
+This project is in the deployment phase.
